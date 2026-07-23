@@ -1,9 +1,6 @@
-Webhooks = {
-    System = "https://discord.com/api/webhooks/1514205587406327898/gWAfzAvcBetLtBF6gKZK_iMrSUlojKVSZHlfSqvvZPs1Y5rgrX2dadO1irWqOC2igaXW",
-    Matches = "https://discord.com/api/webhooks/1514205466862030878/VNd2AQtTeZXvCGkuSUzCQZYdMi52eqZp4pMgmHSmBj7Ymqb_XTOF3vPaYsdPAM8J1CUO",
-    Screenshots = "https://discord.com/api/webhooks/1514205835780423700/_cFMrr56NxennMhX_2CbLZHrvnc9soNYfUfVFooKhnCXh7JfN9iebFj4vAD9pAYTY1Yn",
-    Alerts = "https://discord.com/api/webhooks/1514225776483110934/Opkfj8Ul5fBSp0Wa61TC9M_z4qEIkF89TV4GzKtHm5oVdjUWUlU0knhoFlazLaEYbHhL"
-}
+-- Discord Webhooks (set in config.lua)
+Webhooks = Config.Webhooks or {}
+
 -- 1. Safe Name Helper
 function GetRTSName(source)
     return GetPlayerName(source)
@@ -255,9 +252,9 @@ end
 -- SYSTEM JOIN/LEAVE DIAGNOSTIC LOGS
 -- =======================================================================
 
-local SystemWebhook = "https://discord.com/api/webhooks/1514205466862030878/VNd2AQtTeZXvCGkuSUzCQZYdMi52eqZp4pMgmHSmBj7Ymqb_XTOF3vPaYsdPAM8J1CUO" -- <-- PUT YOUR WEBHOOK URL HERE EXCLUSIVELY
 local function SendSystemLog(title, message, color)
-    if SystemWebhook == nil or SystemWebhook == "" or string.find(SystemWebhook, "YOUR_") then return end
+    local webhook = Webhooks.System
+    if not webhook or webhook == "" then return end
     
     local embed = {
         {
@@ -267,7 +264,7 @@ local function SendSystemLog(title, message, color)
             ["footer"] = { ["text"] = "RTS Operations Hub • " .. os.date("%Y-%m-%d %H:%M:%S") }
         }
     }
-    PerformHttpRequest(SystemWebhook, function(err, text, headers) end, 'POST', json.encode({username = "RTS Core Logs", embeds = embed}), { ['Content-Type'] = 'application/json' })
+    PerformHttpRequest(webhook, function(err, text, headers) end, 'POST', json.encode({username = "RTS Core Logs", embeds = embed}), { ['Content-Type'] = 'application/json' })
 end
 
 -- HELPER FUNCTION: Extracts every piece of data available about the player

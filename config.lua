@@ -648,6 +648,14 @@ Config.Lobby = {
     MaxLobbies = 100,
 }
 
+-- Discord Webhooks (leave empty to disable)
+Config.Webhooks = {
+    System      = "",
+    Matches     = "",
+    Screenshots = "",
+    Alerts      = "",
+}
+
 -- Keybinds
 Config.Keys = {
     SelectAllUnits      = "SPACE",
