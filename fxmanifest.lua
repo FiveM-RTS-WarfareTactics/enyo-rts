@@ -12,12 +12,25 @@ shared_scripts {
 
 client_scripts {
     'client/main.lua',
+    'client/camera.lua',
+    'client/commands.lua',
+    'client/dedicated.lua',
+    'client/environment.lua',
+    'client/nui_bridge.lua',
+    'client/rendering.lua',
+    'client/selection.lua',
+    'client/units.lua',
     'client/editable-main.lua',
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/main.lua',
+    'server/database.lua',
+    'server/lobby.lua',
+    'server/match.lua',
+    'server/matchmaking.lua',
+    'server/commands.lua',
     'server/editable-main.lua',
 }
 
