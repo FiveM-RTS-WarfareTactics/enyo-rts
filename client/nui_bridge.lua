@@ -1,6 +1,6 @@
 -- [[ NEW: LIVE STATS POLLER ]] --
 RegisterNUICallback('requestLiveStats', function(data, cb)
-    QBCore.Functions.TriggerCallback('rts:getLiveMenuStats', function(stats)
+    RTS.TriggerCallback('rts:getLiveMenuStats', function(stats)
         cb(stats)
     end)
 end)
@@ -23,7 +23,7 @@ end)
 RegisterNUICallback('createLobby', function(data, cb)
     local mapName = data.map or "grapeseed"
     
-    QBCore.Functions.TriggerCallback('rts:createLobby', function(result)
+    RTS.TriggerCallback('rts:createLobby', function(result)
         if result.success then
             GameState.isInLobby = true
             GameState.isHost = true
@@ -51,7 +51,7 @@ end)
 RegisterNUICallback('joinLobby', function(data, cb)
     local code = data.code:upper():gsub("%s+", "")
     
-    QBCore.Functions.TriggerCallback('rts:joinLobby', function(result)
+    RTS.TriggerCallback('rts:joinLobby', function(result)
         if result.success then
             GameState.isInLobby = true
             GameState.isHost = result.isHost
@@ -457,31 +457,31 @@ RegisterNUICallback('close', function(data, cb)
 end)
 
 RegisterNUICallback('getLeaderboard', function(data, cb)
-    QBCore.Functions.TriggerCallback('rts:getLeaderboard', function(result)
+    RTS.TriggerCallback('rts:getLeaderboard', function(result)
         cb(result)
     end)
 end)
 
 RegisterNUICallback('getHistory', function(data, cb)
-    QBCore.Functions.TriggerCallback('rts:getMatchHistory', function(result)
+    RTS.TriggerCallback('rts:getMatchHistory', function(result)
         cb(result)
     end)
 end)
 
 RegisterNUICallback('getServerPlayerCount', function(data, cb)
-    QBCore.Functions.TriggerCallback('rts:getServerPlayerCount', function(count)
+    RTS.TriggerCallback('rts:getServerPlayerCount', function(count)
         cb({ count = count })
     end)
 end)
 
 RegisterNUICallback('getGlobalStats', function(data, cb)
-    QBCore.Functions.TriggerCallback('rts:getGlobalStats', function(stats)
+    RTS.TriggerCallback('rts:getGlobalStats', function(stats)
         cb(stats)
     end)
 end)
 
 RegisterNUICallback('joinQueue', function(data, cb)
-    QBCore.Functions.TriggerCallback('rts:getServerPlayerCount', function(count)
+    RTS.TriggerCallback('rts:getServerPlayerCount', function(count)
         TriggerServerEvent('rts:joinMatchmaking')
         -- Send the total server player count back to JavaScript
         cb({ success = true, playerCount = count })
@@ -970,7 +970,7 @@ AddEventHandler('rts:resetUI', function()
     GameState.isInMatch = false 
     
     -- [[ FIX: Fetch fresh stats before opening the menu ]] --
-    QBCore.Functions.TriggerCallback('rts:getGlobalStats', function(stats)
+    RTS.TriggerCallback('rts:getGlobalStats', function(stats)
         SendNUIMessage({ 
             action = 'resetUI', -- We send the reset action...
             serverStats = stats -- ...WITH the new data attached!

@@ -17,7 +17,7 @@ RegisterNetEvent('rts:joinMatchmaking', function()
         if p.src == src then return end 
     end
     
-    local Player = QBCore.Functions.GetPlayer(src)
+    local Player = RTS.GetPlayer(src)
     if not Player then return end
     local cid = Player.PlayerData.citizenid
 

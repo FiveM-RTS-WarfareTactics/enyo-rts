@@ -1,5 +1,5 @@
-QBCore = {}
-QBCore.Functions = {}
+RTS = {}
+RTS.Callbacks = {}
 
 -- [[ STANDALONE BRIDGE ]] --
 local RequestId = 0
@@ -13,7 +13,7 @@ AddEventHandler('rts:standalone:callbackResponse', function(reqId, ...)
     end
 end)
 
-QBCore.Functions.TriggerCallback = function(name, cb, ...)
+RTS.TriggerCallback = function(name, cb, ...)
     RequestId = RequestId + 1
     ClientCallbacks[RequestId] = cb
     TriggerServerEvent('rts:standalone:triggerCallback', name, RequestId, ...)
@@ -144,7 +144,7 @@ function OpenRTSCentral()
         local attempts, success = 0, false
         while not success and attempts < 10 do
             Wait(1000)
-            QBCore.Functions.TriggerCallback('rts:getGlobalStats', function(realStats)
+            RTS.TriggerCallback('rts:getGlobalStats', function(realStats)
                 if realStats then
                     if not realStats.myStats then realStats.myStats = {} end
                     if not realStats.myStats.name or realStats.myStats.name == "" then

@@ -14,9 +14,9 @@ function GenerateLobbyCode()
 end
 
 -- Lobby Management
-QBCore.Functions.CreateCallback('rts:createLobby', function(source, cb, mapName)
+RTS.RegisterCallback('rts:createLobby', function(source, cb, mapName)
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
+    local Player = RTS.GetPlayer(src)
     
     if not Player then return cb({ success = false }) end
 
@@ -83,9 +83,9 @@ QBCore.Functions.CreateCallback('rts:createLobby', function(source, cb, mapName)
     })
 end)
 
-QBCore.Functions.CreateCallback('rts:joinLobby', function(source, cb, lobbyCode)
+RTS.RegisterCallback('rts:joinLobby', function(source, cb, lobbyCode)
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
+    local Player = RTS.GetPlayer(src)
     if not Player then return cb({ success = false, message = "Player not found" }) end
     
     local cleanCode = string.upper(lobbyCode or ""):gsub("%s+", "")

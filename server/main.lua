@@ -7,14 +7,14 @@ function GetRTSName(source)
 end
 
 -- 2. Standalone Initialization
-QBCore = {}
-QBCore.Functions = {}
-QBCore.Commands = {}
+RTS = {}
+RTS.Callbacks = {}
+
 
 local ServerCallbacks = {}
 
 -- Standalone Callback Registry
-QBCore.Functions.CreateCallback = function(name, cb)
+RTS.RegisterCallback = function(name, cb)
     ServerCallbacks[name] = cb
 end
 
@@ -35,7 +35,7 @@ RegisterNetEvent('rts:standalone:triggerCallback', function(name, requestId, ...
 end)
 
 -- Standalone Player Mock (Persistent Version)
-QBCore.Functions.GetPlayer = function(source)
+RTS.GetPlayer = function(source)
     local nativeName = GetPlayerName(source)
     if not nativeName then return nil end
     
@@ -161,9 +161,7 @@ end)
 -- =======================================================================
 -- ADMINISTRATIVE PIPELINES & MONITORING EXPORTS
 -- =======================================================================
--- =======================================================================
--- ADMINISTRATIVE PIPELINES & MONITORING EXPORTS
--- =======================================================================
+
 
 exports('GetServerOverview', function()
     local activeMatchCount, playersInMatches = 0, 0
@@ -513,7 +511,7 @@ end)
 -- =======================================================================
 -- SERVER POPULATION CHECKER
 -- =======================================================================
-QBCore.Functions.CreateCallback('rts:getServerPlayerCount', function(source, cb)
+RTS.RegisterCallback('rts:getServerPlayerCount', function(source, cb)
     cb(#GetPlayers())
 end)
 

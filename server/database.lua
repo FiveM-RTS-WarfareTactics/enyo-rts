@@ -45,7 +45,7 @@ CreateThread(function()
 end)
 
 -- [[ LIGHTWEIGHT LIVE STATS (Runs every 5s, no DB queries) ]] --
-QBCore.Functions.CreateCallback('rts:getLiveMenuStats', function(source, cb)
+RTS.RegisterCallback('rts:getLiveMenuStats', function(source, cb)
     local ab = 0 
     for _ in pairs(Matches) do ab = ab + 1 end
     
@@ -57,8 +57,8 @@ QBCore.Functions.CreateCallback('rts:getLiveMenuStats', function(source, cb)
     })
 end)
 -- Add this near the bottom of server.lua
-QBCore.Functions.CreateCallback('rts:getGlobalStats', function(source, cb)
-    local Player = QBCore.Functions.GetPlayer(source)
+RTS.RegisterCallback('rts:getGlobalStats', function(source, cb)
+    local Player = RTS.GetPlayer(source)
     
     -- 1. Default Data Structure (Safe Fallback)
     local defaultStats = {
@@ -119,7 +119,7 @@ QBCore.Functions.CreateCallback('rts:getGlobalStats', function(source, cb)
 end)
 
 -- 1. LEADERBOARD CALLBACK
-QBCore.Functions.CreateCallback('rts:getLeaderboard', function(source, cb)
+RTS.RegisterCallback('rts:getLeaderboard', function(source, cb)
     local result = MySQL.query.await('SELECT name, wins, kills, score FROM rts_player_stats ORDER BY score DESC LIMIT 10')
     
     -- Process levels for each row
@@ -132,8 +132,8 @@ QBCore.Functions.CreateCallback('rts:getLeaderboard', function(source, cb)
 end)
 
 -- 2. MATCH HISTORY CALLBACK
-QBCore.Functions.CreateCallback('rts:getMatchHistory', function(source, cb)
-    local Player = QBCore.Functions.GetPlayer(source)
+RTS.RegisterCallback('rts:getMatchHistory', function(source, cb)
+    local Player = RTS.GetPlayer(source)
     if not Player then return cb({}) end
     
     local history = MySQL.query.await([[

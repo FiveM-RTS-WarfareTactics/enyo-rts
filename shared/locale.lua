@@ -41,7 +41,7 @@ end
 -- =============================================================================
 ServerCallbacks = {}
 
---- Registers a server callback (replaces QBCore.Functions.CreateCallback)
+--- Registers a server callback
 --- @param name string
 --- @param cb function
 function RegisterServerCallback(name, cb)
