@@ -460,7 +460,6 @@ function StartMatchLoop()
             end
 
             -- Sync Position
-            -- Sync Position
             if currentTime - syncTimer >= 500 then
                 local updates = {}
                 local count = 0
@@ -475,7 +474,7 @@ function StartMatchLoop()
                     end
                 end
                 
-                -- [[ THE FIX: Sync CPU Units to the Server so they can capture! ]] --
+                -- [[ Sync CPU Units to the Server so they can capture! ]] --
                 if CpuBot and CpuBot.active and GameState.enemyUnits then
                     for unitId, unit in pairs(GameState.enemyUnits) do
                         if unit.entity and DoesEntityExist(unit.entity) then
@@ -512,7 +511,7 @@ function CleanupMatch(preservePlayer)
     FreezeEntityPosition(ped, false)
     SetEntityCollision(ped, true, true)
    -- RestoreMap()
-   -- [[ FIX: Robust Blip Removal ]] --
+   -- Robust Blip Removal --
     if GameState.objectiveBlips then
         for name, blip in pairs(GameState.objectiveBlips) do
             -- Always try to remove, DoesBlipExist check is good safety
@@ -522,7 +521,7 @@ function CleanupMatch(preservePlayer)
         end
     end
     GameState.objectiveBlips = {} -- Clear the table
-    -- [[ END FIX ]] --
+
     -- Delete all units
     for unitId, unit in pairs(GameState.units) do
         if unit.entity and DoesEntityExist(unit.entity) then
@@ -546,7 +545,7 @@ function CleanupMatch(preservePlayer)
         DestroyCam(GameState.camera, false)
         GameState.camera = nil
     end
-     -- [ADD THIS BLOCK] Clean up Decorative Objects
+     -- Clean up Decorative Objects
     if GameState.decorativeObjects then
         for _, obj in ipairs(GameState.decorativeObjects) do
             if DoesEntityExist(obj) then
@@ -593,9 +592,8 @@ function UpdateTimerUI()
 end
 
 function UpdateObjectiveBlips()
-    -- [[ FIX: Add isInMatch Check ]] --
+    -- Add isInMatch Check
     if not GameState.isInMatch then return end 
-    -- [[ END FIX ]] --
     if not GameState.objectives then return end
 
     -- Initialize table if nil
@@ -734,11 +732,11 @@ CreateThread(function()
 
                 -- ACTION: Report to Server
                 if reportDeath then
-                    -- [[ FIX: REMOVE BLIP BEFORE DELETING DATA ]] --
+                    -- Remove Blip Before Deleting Data
                     if unit.blip and DoesBlipExist(unit.blip) then
                         RemoveBlip(unit.blip)
                     end
-                    -- [[ END FIX ]] --
+
                     TriggerServerEvent('rts:reportUnitDeath', unitId)
                     shouldRemove = true
                 end
@@ -759,7 +757,6 @@ CreateThread(function()
                             enemy.blip = nil -- Prevent trying to remove it again
                         end
                         
-                        -- [[ THE FIX ]] --
                         -- If we are playing against the CPU, the CPU has no client to report its own deaths.
                         -- YOUR client must tell the server to grant you the kill and the score!
                         if CpuBot and CpuBot.active then
@@ -857,19 +854,20 @@ CreateThread(function()
 end)
 
 function FullPlayerReset()
+    -- Fixed indentation for FullPlayerReset
     local ped = PlayerPedId()
     DebugPrint("Starting Full Player Reset...")
 
     -- Random distance (using sqrt for even distribution inside the circle) and random angle
-local dist = 300.0 * math.sqrt(math.random())
-local angle = math.random() * (2 * math.pi)
+    local dist = 300.0 * math.sqrt(math.random())
+    local angle = math.random() * (2 * math.pi)
 
--- Calculate new X and Y based on the center point (-247.76, 6331.23)
-local newX = -247.76 + (dist * math.cos(angle))
-local newY = 6331.23 + (dist * math.sin(angle))
+    -- Calculate new X and Y based on the center point (-247.76, 6331.23)
+    local newX = -247.76 + (dist * math.cos(angle))
+    local newY = 6331.23 + (dist * math.sin(angle))
 
--- Teleport instantly to the new coords at Z = 1000.0
-SetEntityCoords(ped, newX, newY, 1000.0, false, false, false, false)
+    -- Teleport instantly to the new coords at Z = 1000.0
+    SetEntityCoords(ped, newX, newY, 1000.0, false, false, false, false)
     FreezeEntityPosition(ped, true)
     SetEntityVisible(ped, false, false)
     SetEntityCollision(ped, false, false)

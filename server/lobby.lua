@@ -92,7 +92,7 @@ RTS.RegisterCallback('rts:joinLobby', function(source, cb, lobbyCode)
     local lobby = Lobbies[cleanCode]
     if not lobby then return cb({ success = false, message = "Lobby not found" }) end
 
-    -- THE FIX 1: Prevent Double-Joining if the user spammed the Rematch button
+    -- Prevent Double-Joining if the user spammed the Rematch button
     for _, pid in ipairs(lobby.players) do
         if pid == src then
             return cb({ success = true, hostName = lobby.hostName, isHost = (lobby.host == src), lobbyData = GetLobbyDataPayload(lobby) })
@@ -113,7 +113,7 @@ RTS.RegisterCallback('rts:joinLobby', function(source, cb, lobbyCode)
 
     PlayerStates[src] = { lobbyId = cleanCode, ready = false, platoons = {}, isHost = isNewHost, playerName = GetPlayerName(src) }
 
-    -- THE FIX 2: Use the Payload so the Bot's name loads correctly on the very first frame
+    -- Use the Payload so the Bot's name loads correctly on the very first frame
     local payload = GetLobbyDataPayload(lobby)
     
     for _, pid in ipairs(lobby.players) do
@@ -138,7 +138,7 @@ RegisterNetEvent('rts:server:toggleBot', function(action)
     local lobby = Lobbies[state.lobbyId]
     if not lobby or lobby.host ~= src then return end -- Only Host
     
-    -- THE FIX: Prevent modifying bots if you are already ready!
+    -- Prevent modifying bots if you are already ready!
     if state.ready then 
         TriggerClientEvent('rts:nuiNotify', src, { message = "Unready before modifying the lobby.", type = "error" })
         return 
@@ -235,7 +235,7 @@ RegisterNetEvent('rts:setReady', function(isReady)
             else
                 for i, pid in ipairs(lobby.readyPlayers) do if pid == src then table.remove(lobby.readyPlayers, i) break end end
                 
-                -- THE FIX: Kill the Launch Token to abort the ghost timer!
+                -- Kill the Launch Token to abort the ghost timer!
                 if lobby.status == "starting" then
                     lobby.status = "waiting"
                     lobby.launchToken = nil -- This stops the server from starting the match
@@ -265,7 +265,7 @@ RegisterNetEvent('rts:setReady', function(isReady)
                 end
                 
                 SetTimeout(Config.Lobby.ReadyCheckDuration * 1000, function() 
-                    -- THE FIX: Only start the match if the token hasn't changed!
+                    -- Only start the match if the token hasn't changed!
                     if lobby.launchToken == token then
                         StartMatchFromLobby(lobbyCode) 
                     else
@@ -318,7 +318,7 @@ RegisterNetEvent('rts:savePlatoons', function(platoons)
         -- 2. Update Lobby State
         PlayerStates[src].platoons = formattedPlatoons
 
-        -- 3. THE CRITICAL FIX: Sync directly to the Active Match!
+        -- 3. Sync directly to the Active Match!
         -- If the match started before the save finished, this guarantees the server 
         -- updates the live game memory, allowing the CPU to access the funds/units!
         local matchId, match = GetPlayerMatch(src)

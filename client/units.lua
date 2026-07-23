@@ -18,7 +18,7 @@ LazarFormation = {
     index = 0
 }
 
--- UPDATED: TIGHTER "Blue Angels" Style Offsets
+-- Tighter "Blue Angels" style offsets
 -- X = Right (+), Left (-)
 -- Y = Forward (+), Backward (-)
 V_OFFSETS = {
@@ -1034,9 +1034,6 @@ function RestrictToGround(vehicleEntity)
     end)
 end
 
-
-
-
 -- =========================================================
 -- RESTRICT TO AIR: Only shoots at Air Units (Helis, Planes)
 -- =========================================================
@@ -1540,8 +1537,8 @@ function SpawnUnit(unitData)
         LazarFormation.index = LazarFormation.index + 1
     end
 
-    -- [[ FIX 1: INCREASE MODEL LOAD TIMEOUT ]] --
-    -- Slow PCs need more than 1 second (100 ticks * 10ms = 1s). Increased to 10s (1000 ticks).
+    -- Increase model load timeout
+    -- Slow PCs need more than 1 second. Increased to 10s.
     RequestModel(modelHash)
     local retries = 0
     while not HasModelLoaded(modelHash) and retries < 1000 do 
@@ -1612,7 +1609,7 @@ function SpawnUnit(unitData)
             SetVehicleOnGroundProperly(entity)
         end
 
-        -- [[ FIX 2: SAFE NETWORKING LOOP ]] --
+        -- Safe networking loop
         -- Don't wait forever. If it fails, continue anyway so the unit works locally.
         local netTries = 0
         while not NetworkGetEntityIsNetworked(entity) and netTries < 50 do 
@@ -1647,10 +1644,7 @@ function SpawnUnit(unitData)
             -- Spawn Trailer slightly behind
             while not DoesEntityExist(entity) do Wait(100) end
             local spawnPos = GetEntityCoords(entity)
-            DebugPrint("Trailer Debug 0", unitConfig.trailer, spawnPos)
             trailer = CreateVehicle(modelHash, spawnPos.x, spawnPos.y - 5.0, spawnPos.z, GetEntityHeading(entity), true, true)
-            
-            DebugPrint("Trailer Debug 1")
             trailerEntity = trailer
             if unitConfig.teamColors and unitConfig.teamColors[teamKey] then
                 local colors = unitConfig.teamColors[teamKey]
@@ -1734,7 +1728,6 @@ function SpawnUnit(unitData)
                     end
                     Wait(10)
                     if seat > -1 and (IsTurretSeat(entity,seat) or anyseat) and not IsPedInAnyVehicle(ped) then 
-                        DebugPrint("PED DIDNT ENTER VEHICLE, NOW TRYING TO SET IT INTO THE VEHICLE!")
                         SetPedIntoVehicle(ped, entity, seat)
                     end
                     if seat == -1 and GetPedInVehicleSeat(entity, -1) ~= ped then
@@ -1766,19 +1759,7 @@ function SpawnUnit(unitData)
         SetVehicleMod(entity, 12, 2, false) -- Brakes Level 3
         SetVehicleMod(entity, 13, 2, false) -- Transmission Level 3
 
-       -- if modelName == "havok" then
-       --  SetVehicleMod(entity, 10, 0, false)
-       -- end
-       -- if modelName == "halftrack" then
-       --  SetVehicleMod(entity, 10, 0, false)
-       -- end
-       -- if modelName == "barrage" then
-       --  SetVehicleMod(entity, 10, 0, false)
-       -- end
-       -- if modelName == "khanjali" then
-       --  SetVehicleMod(entity, 10, 0, false)
-       -- end
-        if unitConfig.ModKit10 then
+   if unitConfig.ModKit10 then
             SetVehicleMod(entity, 10, unitConfig.ModKit10, false)
         end
         -- [[ END: FULL ARMOR UPGRADE ]] --
@@ -1816,7 +1797,7 @@ function SpawnUnit(unitData)
         while not DoesEntityExist(entity) and entWait < 100 do Wait(0); entWait = entWait + 1 end
         if not DoesEntityExist(entity) then return end
 
-        -- [[ FIX 3: SAFE NETWORKING LOOP FOR INFANTRY ]] --
+        -- Safe networking loop for infantry
         local netTries = 0
         while not NetworkGetEntityIsNetworked(entity) and netTries < 50 do 
             NetworkRegisterEntityAsNetworked(entity)
@@ -1834,7 +1815,7 @@ function SpawnUnit(unitData)
             end
         end
 
-        -- [[ FIX 4: APPLY LOGIC EVEN IF NETWORKING STALLS ]] --
+        -- Apply logic even if networking stalls
         
         SetPedCombatAttributes(entity, 46, true)
         SetPedFleeAttributes(entity, 0, false)

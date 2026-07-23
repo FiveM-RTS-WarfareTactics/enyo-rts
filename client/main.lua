@@ -23,7 +23,7 @@ end
 GameState = {
     deployedPlatoons = {}, -- NEW: Track alive platoons groups
     objectiveBlips = {}, -- NEW: Track blip handles
-    decorativeObjects = {}, -- <--- ADD THIS LINE
+    decorativeObjects = {},
 
     isInLobby = false,
     isInMatch = false,
@@ -127,7 +127,7 @@ function OpenRTSCentral()
         activeBattles = 0,
         ping = 35, 
         lobbyCount = 0,
-        estimatedWait = "CALCULATING...", -- <--- ADD THIS LINE
+        estimatedWait = "CALCULATING...",
         myStats = {
             name = localName,
             wins = 0, kills = 0, score = 0,
@@ -136,7 +136,7 @@ function OpenRTSCentral()
     }
 
     SetNuiFocus(true, true)
-    SetNuiFocusKeepInput(false) -- <--- THIS FIXES THE PUNCHING SOUND
+    SetNuiFocusKeepInput(false)
     SendNUIMessage({ action = 'showCentralMenu', serverStats = fallbackStats })
 
     -- Background loop to fetch real DB stats
@@ -243,9 +243,7 @@ AddEventHandler('onResourceStop', function(resourceName)
 
     DebugPrint("[RTS] Resource stopping, restoring environment")
     
-    -- [[ FIX: ADD THIS LINE ]] --
     CleanupMatch() 
-    -- [[ END FIX ]] --
 
     RestoreEnvironment()
     FullPlayerReset()

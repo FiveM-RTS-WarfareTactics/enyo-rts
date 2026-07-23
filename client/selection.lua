@@ -21,13 +21,7 @@ function SelectUnitsByCategory(category)
     for unitId, unit in pairs(GameState.units) do
         if unit.entity and DoesEntityExist(unit.entity) and unit.category == category then
             table.insert(GameState.selectedUnits, unitId)
-          --  SetEntityDrawOutline(unit.entity, true)
-          --  SetEntityDrawOutlineColor(
-          --      Config.MatchSettings.SelectionOutlineColor[1],
-          --      Config.MatchSettings.SelectionOutlineColor[2],
-          --      Config.MatchSettings.SelectionOutlineColor[3],
-          --      Config.MatchSettings.SelectionOutlineColor[4]
-          --  )
+
         end
     end
     
@@ -42,7 +36,6 @@ function DeselectAllUnits()
     for _, unitId in ipairs(GameState.selectedUnits) do
         local unit = GameState.units[unitId]
         if unit and unit.entity and DoesEntityExist(unit.entity) then
-          --  SetEntityDrawOutline(unit.entity, false)
         end
     end
     GameState.selectedUnits = {}
@@ -217,8 +210,6 @@ function SelectUnitsInRectangle(rect)
                     table.insert(GameState.selectedUnits, unitId)
                     
                     -- Visual Feedback
-                  --  SetEntityDrawOutline(unit.entity, true)
-                  --  SetEntityDrawOutlineColor(0, 255, 0, 255) -- Green
                     
                     selectedCount = selectedCount + 1
                 end

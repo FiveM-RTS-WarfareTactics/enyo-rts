@@ -80,10 +80,10 @@ end)
 -- Resource start
 AddEventHandler('onResourceStart', function(resourceName)
     if resourceName == GetCurrentResourceName() then
-        PrintDebug("Tactical RTS server started")
+        DebugPrint("Tactical RTS server started")
         Matches, Lobbies, PlayerStates, GameBuckets = {}, {}, {}, {}
         for _, pid in ipairs(GetPlayers()) do SetPlayerRoutingBucket(tonumber(pid), 0) end
-        PrintDebug("Game states cleared")
+        DebugPrint("Game states cleared")
     end
 end)
 

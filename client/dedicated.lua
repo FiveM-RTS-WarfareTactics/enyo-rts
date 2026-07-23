@@ -13,15 +13,15 @@ local function SafeStartDedicated()
         while not DoesEntityExist(ped) do Wait(0) ped = PlayerPedId() end
         
         -- Random distance (using sqrt for even distribution inside the circle) and random angle
-local dist = 300.0 * math.sqrt(math.random())
-local angle = math.random() * (2 * math.pi)
+        local dist = 300.0 * math.sqrt(math.random())
+        local angle = math.random() * (2 * math.pi)
 
--- Calculate new X and Y based on the center point (-247.76, 6331.23)
-local newX = -247.76 + (dist * math.cos(angle))
-local newY = 6331.23 + (dist * math.sin(angle))
+        -- Calculate new X and Y based on the center point (-247.76, 6331.23)
+        local newX = -247.76 + (dist * math.cos(angle))
+        local newY = 6331.23 + (dist * math.sin(angle))
 
--- Teleport instantly to the new coords at Z = 1000.0
-SetEntityCoords(ped, newX, newY, 1000.0, false, false, false, false)
+        -- Teleport instantly to the new coords at Z = 1000.0
+        SetEntityCoords(ped, newX, newY, 1000.0, false, false, false, false)
         FreezeEntityPosition(ped, true)
         SetEntityVisible(ped, false, false)
         SetEntityCollision(ped, false, false)

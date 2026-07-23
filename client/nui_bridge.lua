@@ -72,7 +72,7 @@ RegisterNUICallback('leaveLobby', function(data, cb)
 end)
 
 RegisterNUICallback('readyToggle', function(data, cb) 
-    -- THE FIX: Don't flip it blindly! Use the EXACT state the UI sends.
+    -- Use the EXACT state the UI sends.
     GameState.playerReady = data.ready
     
     TriggerServerEvent('rts:setReady', GameState.playerReady) 
@@ -231,7 +231,7 @@ RegisterNUICallback('issueCommand', function(data, cb)
 
         if targetEntity and DoesEntityExist(targetEntity) then
             PlaySoundFrontend(-1, Config.Sounds.CommandAttack, 0, true)
-            -- [CRITICAL FIX] Convert Vehicle Target -> Driver Target
+            -- Convert Vehicle Target -> Driver Target
             -- AI struggles to attack "Cars". They attack "Drivers" much better.
             if IsEntityAVehicle(targetEntity) then
                 local enemyDriver = GetPedInVehicleSeat(targetEntity, -1)
@@ -532,8 +532,6 @@ AddEventHandler('rts:updateLobby', function(data)
     SendNUIMessage({
         action = 'updateLobby',
         lobbyCode = data.lobbyCode,
-        
-        -- [[ THIS WAS MISSING - IT CARRIES THE READY STATUS ]] --
         playersData = data.playersData, 
         
         players = data.players,
@@ -600,8 +598,6 @@ RegisterNetEvent('rts:startMatch', function(data)
         GameState.currentMap = "grapeseed" 
     end
 
-
-
     -- 3. Set Game State (CRITICAL)
     GameState.isInMatch = true
     GameState.matchId = data.matchId
@@ -659,7 +655,7 @@ RegisterNetEvent('rts:startMatch', function(data)
         SendNUIMessage({action = 'showNotification', message = "Match Started!", type = "success"})
         StartSelectionRenderer()
         StartObjectiveSystem()
-        StartFogOfWarSystem() -- <--- ADD THIS
+        StartFogOfWarSystem()
         SpawnMapDecorations(GameState.currentMap)
         if GetResourceState('rts-weapons') == 'started' then
             exports['rts-weapons']:ApplyWeaponModifiers()
@@ -931,7 +927,6 @@ AddEventHandler('rts:endMatch', function(result)
         stats = result.stats,
         matchData = result.matchData,
         
-        -- [[ THIS WAS MISSING ]] --
         levelData = result.levelData 
     })
     
@@ -1121,9 +1116,6 @@ RegisterNetEvent('rts:client:adminForceStart', function()
 end)
 
 -- =======================================================================
--- CPU BOT BRAIN & SPAWNER (Dynamic Priority AI)
--- =======================================================================
--- =======================================================================
 -- CPU BOT BRAIN V3.0 (Army Splitting & Anti-Clumping Formations)
 -- =======================================================================
 function StartCpuBotBrain(mirroredPlatoons)
@@ -1133,7 +1125,7 @@ function StartCpuBotBrain(mirroredPlatoons)
     CpuBot.cooldowns = {0,0,0,0,0}
     CpuBot.targetPlatoon = nil
 
-    -- [[ THE FIX: SANITIZE NO-AI UNITS ]] --
+    -- Sanitize NO-AI units
     -- The bot scans the human's platoons and deletes anything it shouldn't use.
     CpuBot.platoons = {}
     for slotStr, pData in pairs(mirroredPlatoons or {}) do
@@ -1273,7 +1265,7 @@ function StartCpuBotBrain(mirroredPlatoons)
                             if closestEnemyEnt then
                                 -- THREAT DETECTED: Engage!
                                 
-                                -- [CRITICAL FIX] Convert Vehicle Target -> Driver Target
+            -- Convert Vehicle Target -> Driver Target
                                 -- GTA AI struggles to shoot at "Cars". They shoot "Drivers" much better.
                                 local combatTarget = closestEnemyEnt
                                 if IsEntityAVehicle(combatTarget) then
@@ -1545,7 +1537,7 @@ RegisterNetEvent('rts:client:cpuDoSpawn', function(unitData)
             SetEntityHealth(entity, uConf.health)
             SetPedArmour(entity, 0)
             
-            -- THE FIX: Sync true body health so they don't explode early
+            -- Sync true body health so they don't explode early
             if IsEntityAVehicle(entity) then
                 SetVehicleBodyHealth(entity, uConf.health + 0.0)
             end

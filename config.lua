@@ -16,9 +16,9 @@ Config.MatchSettings = {
     CommandPointsPerMinute = 700,    -- Passive income: points earned every minute.
     RespawnCooldown = 30,            -- Time in seconds before a dead unit can be respawned.
     
-    -- CAMERA CONTROLS [NOT RECOMMENDED TO CHANGE]
+    -- CAMERA CONTROLS
     CameraDefaultHeight = 40.0,      -- The height the camera starts at.
-    CameraMinHeight = 3.0,          -- Zoom In Limit: Lower = closer to ground (Don't go below 10.0).
+    CameraMinHeight = 3.0,          -- Zoom In Limit: Lower = closer to ground.
     CameraMaxHeight = 60.0,         -- Zoom Out Limit: Higher = see more of the map.
     
     -- MOVEMENT FEEL
@@ -59,7 +59,6 @@ Config.Platoon = {
 --  UNIT CATEGORIES (UI ONLY)
 -------------------------------------------------------------------------------
 -- This sorts the units in the shop menu.
--- DO NOT delete categories unless you know how to edit the HTML/JS.
 Config.UnitCategories = {
     infantry = { name = "INFANTRY", color = "#4a90e2", sort = 1, icon = "fas fa-person-rifle" },
     vehicles = { name = "VEHICLES", color = "#e67e22", sort = 2, icon = "fas fa-truck-front" },
@@ -628,12 +627,8 @@ Config.Maps = {
             { model = "prop_box_ammo03a_set2", x = -711.04, y = -866.60, z = 23.27, h = 267.70 },
             { model = "prop_box_ammo03a_set2", x = -711.07, y = -868.00, z = 23.40, h = 267.70 },
             { model = "prop_box_ammo03a_set2", x = -709.47, y = -867.28, z = 23.05, h = 267.70 },
-        }
     }
 }
-
-
-
 
 -- Rewards & Economy
 Config.Rewards = {

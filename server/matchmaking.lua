@@ -298,7 +298,7 @@ RegisterNetEvent('rts:startAiMatchFromQueue', function()
         local lobby = Lobbies[code]
         if not lobby then return end
         
-        -- [[ THE FIX: Use Config.Bots just like your manual button ]] --
+        -- Pick a random bot
         local bot = Config.Bots[math.random(#Config.Bots)]
         
         -- Add the Bot to the room using the Bot's ID and Name from Config

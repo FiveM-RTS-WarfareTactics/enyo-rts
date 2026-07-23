@@ -5,14 +5,6 @@
 
 function GetAvailableBucket()
     return math.random(100, 9000)
-    --for bucket = Config.MatchSettings.GameBucketStart, 
-    --            Config.MatchSettings.GameBucketStart + Config.Lobby.MaxLobbies do
-    --    if not GameBuckets[bucket] then
-    --        GameBuckets[bucket] = true
-    --        return bucket
-    --    end
-    --end
-    --return Config.MatchSettings.GameBucketStart + math.random(1, Config.Lobby.MaxLobbies)
 end
 
 function ReleaseBucket(bucket)
@@ -20,11 +12,10 @@ function ReleaseBucket(bucket)
 end
 
 -- Match Management
--- Match Management
 function StartMatchFromLobby(lobbyCode)
     local lobby = Lobbies[lobbyCode]
     
-    -- THE FIX: Double-check that the lobby wasn't aborted during the timeout!
+    -- Double-check that the lobby wasn't aborted during the timeout!
     if not lobby then return end
     if lobby.status ~= "starting" and not lobby.forceStart then return end 
     if #lobby.players ~= Config.MatchSettings.MaxPlayers and not lobby.forceStart then return end
@@ -48,12 +39,11 @@ function StartMatchFromLobby(lobbyCode)
         if type(pid) == "string" and string.sub(pid, 1, 4) == "bot_" then hasBot = true; botId = pid end
     end
 
-    -- THE FIX: We must tell the server's memory that this is a CPU match!
     Matches[matchId] = { 
         id = matchId, lobbyCode = lobbyCode, players = {}, units = {}, objectives = {}, 
         startTime = os.time(), active = true, bucket = gameBucket, map = lobby.map, 
         matchData = { totalUnits = 0, totalDamage = 0, events = {} },
-        isCpuMatch = hasBot -- <--- THIS WAS MISSING!
+        isCpuMatch = hasBot
     }
     -- 2. INITIALIZE OBJECTIVES
     if map.objectives then
@@ -64,7 +54,7 @@ function StartMatchFromLobby(lobbyCode)
                 type = objective.type, -- "victory" or "resource"
                 position = vector3(objective.x, objective.y, objective.z),
                 
-                -- CRITICAL: Set defaults if config is missing them
+                -- Set defaults if config is missing them
                 radius = objective.radius or 15.0, 
                 captureRate = objective.captureRate or 5.0,
                 bonus = objective.bonus or 0.0, -- Ensure bonus is saved for resource calc
@@ -77,7 +67,7 @@ function StartMatchFromLobby(lobbyCode)
         end
     end
     
-    -- THE FIX: Initialize our Discord trackers before the loop starts
+    -- Initialize our Discord trackers before the loop starts
     local logPlayersData, sqlLicenses = {}, {}
     local hasBot = false
     
@@ -85,7 +75,7 @@ function StartMatchFromLobby(lobbyCode)
         if type(pid) == "string" and string.sub(pid, 1, 4) == "bot_" then hasBot = true end
     end
 
-    -- THE FIX: If the Bot somehow got into Slot 1, swap it with the Human so Human is ALWAYS Team 1!
+    -- If the Bot somehow got into Slot 1, swap it with the Human so Human is ALWAYS Team 1!
     if #lobby.players == 2 then
         local p1_isBot = (type(lobby.players[1]) == "string" and string.sub(lobby.players[1], 1, 4) == "bot_")
         if p1_isBot then
@@ -110,7 +100,7 @@ function StartMatchFromLobby(lobbyCode)
                 commandPoints = Config.MatchSettings.CommandPointsStart,
                 units = {}, capturedObjectives = {}, kills = 0, unitsLost = 0, damageDealt = 0, 
 
-                -- THE FIX: Ensure the name explicitly contains [AI] and the ID starts with "bot_"
+                -- Ensure the name explicitly contains [AI] and the ID starts with "bot_"
                 playerName = "A.I. COMMANDER [AI]", 
                 identifier = "bot_cpu" 
             }
@@ -161,8 +151,8 @@ function StartMatchFromLobby(lobbyCode)
             end
 
             -- Begin assembling the embed content block text strings
-            local logMsg = string.format("🌐 **Match ID:** `#%s`\n📍 **Arena Zone:** `%s`\n🪣 **Routing Bucket:** `%s`\n", matchId, lobby.map:upper(), gameBucket)
-            logMsg = logMsg .. "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 **COMBATANT OPERATION DOSSIER:**\n"
+            local logMsg = string.format("**Match ID:** `#%s`\n**Arena Zone:** `%s`\n**Routing Bucket:** `%s`\n", matchId, lobby.map:upper(), gameBucket)
+            logMsg = logMsg .. "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n**COMBATANT OPERATION DOSSIER:**\n"
 
             for licenseKey, pLog in pairs(logPlayersData) do
                 local stats = statsMap[licenseKey] or { wins = 0, losses = 0, kills = 0, score = 0 }
@@ -179,20 +169,20 @@ function StartMatchFromLobby(lobbyCode)
                 end
 
                 logMsg = logMsg .. string.format(
-                    "\n👤 **%s** (ID: `%s` | Team %s)\n" ..
-                    "» 🔑 **License Hash:** `%s`\n" ..
-                    "» 🏆 **Rank Baseline:** `%s pts` (%sW / %sL | %s Kills)\n" ..
-                    "» 🪖 **Deployed Platoons:** *%s*\n",
+                    "\n**%s** (ID: `%s` | Team %s)\n" ..
+                    "» **License Hash:** `%s`\n" ..
+                    "» **Rank Baseline:** `%s pts` (%sW / %sL | %s Kills)\n" ..
+                    "» **Deployed Platoons:** *%s*\n",
                     pLog.name, pLog.src, pLog.team, licenseKey, stats.score, stats.wins, stats.losses, stats.kills, platoonStr
                 )
             end
             
             logMsg = logMsg .. "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            SendDiscordLog(Webhooks.Matches, "⚔️ Match Started Operations", logMsg, 3447003)
+            SendDiscordLog(Webhooks.Matches, "Match Started Operations", logMsg, 3447003)
         end)
     else
         -- Fallback if the database connector encounters an outage during load
-        SendDiscordLog(Webhooks.Matches, "⚔️ Match Started (Basic Fallback)", "**Match ID:** " .. matchId .. "\n**Map:** " .. lobby.map, 3447003)
+        SendDiscordLog(Webhooks.Matches, "Match Started (Basic Fallback)", "**Match ID:** " .. matchId .. "\n**Map:** " .. lobby.map, 3447003)
     end
 end
 
@@ -259,7 +249,7 @@ function StartObjectiveTick(matchId)
         if not match then return end
         
         while match.active do
-            Wait(1000) -- FIX: Changed from 5000 to 500 (Updates 2x per second)
+            Wait(1000) -- Updates 2x per second
             
             UpdateObjectives(matchId)
             
@@ -387,8 +377,6 @@ function CheckVictoryConditions(matchId)
     end
     return nil
 end
-
-
 
 function CalculateRewards(playerData, isWinner, matchDuration, resultType)
     local baseRewards = isWinner and Config.Rewards.Victory or Config.Rewards.Defeat
@@ -582,58 +570,6 @@ function GetEnemyPlayer(playerId, match)
     return nil
 end
 
--- Unit Damage System
---RegisterNetEvent('rts:unitTakeDamage', function(unitId, damage, attackerId)
---    local src = source
---    
---    local matchId, match = GetPlayerMatch(src)
---    if not match then return end
---    
---    local unit = match.units[unitId]
---    if not unit then return end
---    
---    -- Apply damage with armor reduction
---    local effectiveDamage = damage * (1 - (unit.armor / 1000))
---    effectiveDamage = math.max(1, effectiveDamage)
---    
---    unit.health = math.max(0, unit.health - effectiveDamage)
---    
---    -- Update health on owner's client
---    TriggerClientEvent('rts:updateUnitHealth', unit.owner, unitId, unit.health, unit.maxHealth)
---    
---    -- Update attacker's stats
---    if attackerId and match.players[attackerId] then
---        match.players[attackerId].damageDealt = match.players[attackerId].damageDealt + effectiveDamage
---    end
---    
---    -- Check if unit destroyed
---    if unit.health <= 0 then
---        -- Record kill
---        if attackerId and match.players[attackerId] then
---            match.players[attackerId].kills = match.players[attackerId].kills + 1
---        end
---        
---        -- Record unit loss
---        if match.players[unit.owner] then
---            match.players[unit.owner].unitsLost = match.players[unit.owner].unitsLost + 1
---        end
---        
---        -- Destroy unit
---        match.units[unitId] = nil
---        
---        -- Notify owner
---        TriggerClientEvent('rts:unitDestroyed', unit.owner, unitId)
---        
---        -- Notify enemy
---        local enemyPlayer = GetEnemyPlayer(unit.owner, match)
---        if enemyPlayer then
---            TriggerClientEvent('rts:enemyUnitDestroyed', enemyPlayer, unitId)
---        end
---        
---        DebugPrint("Unit " .. unitId .. " destroyed by player " .. (attackerId or "unknown"))
---    end
---end)
-
 -- Player Commands
 RegisterNetEvent('rts:updateCameraPosition', function(position)
     local src = source
@@ -658,7 +594,7 @@ RegisterNetEvent('rts:registerUnitEntity', function(matchId, unitId, netId)
         if enemyPlayer then
             TriggerClientEvent('rts:spawnEnemyUnit', enemyPlayer, {
                 unitId = unitId,
-                netId = netId, -- CRITICAL: Send NetID to enemy
+                netId = netId, -- Send NetID to enemy
                 team = match.units[unitId].team,
                 type = match.units[unitId].type,
                 health = unitConfig.health,
@@ -681,7 +617,7 @@ RegisterNetEvent('rts:registerUnitEntityDriver', function(matchId, unitId, netId
         if enemyPlayer then
             TriggerClientEvent('rts:spawnEnemyUnitDriver', enemyPlayer, {
                 unitId = unitId,
-                netId = netId, -- CRITICAL: Send NetID to enemy
+                netId = netId, -- Send NetID to enemy
                 team = match.units[unitId].team,
                 type = match.units[unitId].type,
                 position = match.units[unitId].position,
@@ -701,7 +637,7 @@ RegisterNetEvent('rts:syncUnitPositions', function(updates)
             local uid = tonumber(unitId)
             local unit = match.units[uid]
             
-            -- THE FIX: Allow update if the player owns it OR if it's a CPU unit in a bot match
+            -- Allow update if the player owns it OR if it's a CPU unit in a bot match
             if unit and (unit.owner == src or (unit.owner == "CPU" and match.isCpuMatch)) then
                 unit.position = vector3(newPos.x, newPos.y, newPos.z)
             end
@@ -709,11 +645,6 @@ RegisterNetEvent('rts:syncUnitPositions', function(updates)
     end
 end)
 
--- [[ SIMPLIFIED DEATH HANDLER ]] --
--- Only counts kills. No damage math.
--- [[ FIXED KILL TRACKER ]] --
--- [[ FIXED DEATH HANDLER ]] --
--- [[ FIXED DEATH HANDLER ]] --
 RegisterNetEvent('rts:reportUnitDeath', function(unitId)
     local src = source
     local matchId, match = GetPlayerMatch(src)
@@ -758,10 +689,7 @@ RegisterNetEvent('rts:reportUnitDeath', function(unitId)
     end
 end)
 
--- [[ UPDATED END MATCH ]] --
--- Calculates Score, Counts Objectives, Saves to DB
--- [[ UPDATED END MATCH ]] --
--- [[ UPDATED END MATCH ]] --
+-- End Match
 function EndMatch(matchId, result)
     local match = Matches[matchId]
     if not match or not match.active then return end
@@ -771,7 +699,7 @@ function EndMatch(matchId, result)
     local matchDuration = match.endTime - match.startTime
     local oldCode = match.lobbyCode
     
-    -- THE FIX: Safely transfer the bot to the Rematch Lobby
+    -- Safely transfer the bot to the Rematch Lobby
     local remPlayers = {}
     local remReady = {}
     
@@ -800,7 +728,7 @@ function EndMatch(matchId, result)
     -- ==========================================
     -- DISCORD: SETUP AFTER-ACTION REPORT HEADER
     -- ==========================================
-    local discordLogMsg = string.format("🌐 **Match ID:** `#%s`\n📍 **Arena Zone:** `%s`\n⏱️ **Duration:** `%d seconds`\n🛑 **Resolution:** `%s`\n", 
+    local discordLogMsg = string.format("**Match ID:** `#%s`\n**Arena Zone:** `%s`\n**Duration:** `%d seconds`\n**Resolution:** `%s`\n", 
         matchId, string.upper(match.map), matchDuration, string.upper(result.type or "Completed"))
     discordLogMsg = discordLogMsg .. "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 **AFTER-ACTION REPORT:**\n"
     
@@ -837,7 +765,7 @@ function EndMatch(matchId, result)
                     Wait(1000) if GetPlayerName(pid) then SetPlayerRoutingBucket(pid, 0) end
                 end
             end)
-            discordLogMsg = discordLogMsg .. string.format("\n👤 **%s** (Team %s) — %s\n» 🎯 **Kills:** `%d` | 💀 **Units Lost:** `%d`\n» 🏆 **Score Earned:** `+%d pts`\n", pData.playerName or "Unknown", pData.team, isWinner and "🟢 **VICTORY**" or "🔴 **DEFEAT**", pData.kills or 0, pData.unitsLost or 0, matchScore)
+            discordLogMsg = discordLogMsg .. string.format("\n**%s** (Team %s) — %s\n» **Kills:** `%d` | **Units Lost:** `%d`\n» **Score Earned:** `+%d pts`\n", pData.playerName or "Unknown", pData.team, isWinner and "**VICTORY**" or "**DEFEAT**", pData.kills or 0, pData.unitsLost or 0, matchScore)
         end)
     end
     
@@ -845,9 +773,9 @@ function EndMatch(matchId, result)
     -- DISCORD: FINALIZE AND SEND THE EMBED
     -- ==========================================
     discordLogMsg = discordLogMsg .. "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    SendDiscordLog(Webhooks.Matches, "🏁 Match Concluded", discordLogMsg, 16753920) -- Orange Hex Color
+    SendDiscordLog(Webhooks.Matches, "Match Concluded", discordLogMsg, 16753920) -- Orange Hex Color
     
-    -- CRITICAL FIX: Just delete the match and let the players ready up in the lobby themselves
+    -- Just delete the match and let the players ready up in the lobby themselves
     SetTimeout(2000, function()
         ReleaseBucket(match.bucket)
         Matches[matchId] = nil
@@ -898,7 +826,7 @@ RegisterNetEvent('rts:server:cpuSpawnPlatoon', function(matchId, platoonIndex)
     
     if not humanPlatoon then return end
 
-    -- [[ THE FIX: SANITIZE NO-AI UNITS ON THE SERVER ]] --
+    -- Sanitize NO-AI units on the server
     local validUnits = {}
     local actualAiCost = 0
     local actualAiPop = 0

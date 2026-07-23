@@ -10,7 +10,7 @@ CreateThread(function()
         MySQL.query.await([[
             CREATE TABLE IF NOT EXISTS rts_player_stats (
                 citizenid VARCHAR(50) NOT NULL,
-                name VARCHAR(100), -- Added this line
+                name VARCHAR(100),
                 wins INT DEFAULT 0,
                 losses INT DEFAULT 0,
                 kills INT DEFAULT 0,
@@ -21,7 +21,7 @@ CreateThread(function()
                 PRIMARY KEY (citizenid)
             )
         ]])
-        -- Add this inside the existing CreateThread function in server.lua
+        -- Create match history table
         MySQL.query.await([[
             CREATE TABLE IF NOT EXISTS rts_match_history (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -56,7 +56,7 @@ RTS.RegisterCallback('rts:getLiveMenuStats', function(source, cb)
         estimatedWait = GetEstimatedWaitTime()
     })
 end)
--- Add this near the bottom of server.lua
+
 RTS.RegisterCallback('rts:getGlobalStats', function(source, cb)
     local Player = RTS.GetPlayer(source)
     
@@ -78,7 +78,7 @@ RTS.RegisterCallback('rts:getGlobalStats', function(source, cb)
             activeBattles = 0, 
             myStats = defaultStats, 
             ping = GetPlayerPing(source) ,
-            estimatedWait = GetEstimatedWaitTime() -- <--- ADD THIS LINE
+            estimatedWait = GetEstimatedWaitTime()
         }) 
     end
     
