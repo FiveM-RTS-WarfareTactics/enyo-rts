@@ -44,13 +44,14 @@ server_scripts {
     'server/commands.lua',
 }
 
+loadscreen 'html/index.html'
+
 ui_page 'html/index.html'
 
 files {
     'html/index.html',
     'html/css/*.css',
     'html/js/*.js',
-    'html/js/modules/*.js',
     'html/images/*',
     'html/images/units/*',
     'html/images/maps/*',

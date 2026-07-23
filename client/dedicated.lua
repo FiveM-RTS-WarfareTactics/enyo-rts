@@ -13,7 +13,7 @@ CreateThread(function()
     SetEntityInvincible(ped, true)
     FreezeEntityPosition(ped, true)
 
-    SendNUIMessage({ action = 'openMenu' })
+    SendNUIMessage({ action = 'showCentralMenu' })
     SetNuiFocus(true, true)
     SetNuiFocusKeepInput(true)
 end)
@@ -40,7 +40,7 @@ RegisterCommand('rts', function(source)
         local hasPerms = IsPlayerAceAllowed(source, "command") or IsPlayerAceAllowed(source, "command.rtsadmin")
         if not hasPerms then return end
     end
-    SendNUIMessage({ action = 'openMenu' })
+    SendNUIMessage({ action = 'showCentralMenu' })
     SetNuiFocus(true, true)
     SetNuiFocusKeepInput(true)
 end, false)
