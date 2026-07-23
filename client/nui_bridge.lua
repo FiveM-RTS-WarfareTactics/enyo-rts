@@ -662,7 +662,7 @@ RegisterNetEvent('rts:startMatch', function(data)
         end
    --     TempChangeMap()
         WreckScanner(map.center, map.range)
-        StartEnvironmentLock()
+        ApplyMapEnvironment()
         
         -- AI BOT HOOK
         if data.isCpuMatch then StartCpuBotBrain(data.platoons) else CpuBot = { active = false, commandPoints = 1500, cooldowns = {0,0,0,0,0}, platoons = {}, lastThink = 0, targetPlatoon = nil }
