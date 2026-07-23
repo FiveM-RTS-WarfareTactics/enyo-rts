@@ -52,6 +52,7 @@ files {
     'html/index.html',
     'html/css/*.css',
     'html/js/*.js',
+    'html/js/modules/*.js',
     'html/images/*',
     'html/images/units/*',
     'html/images/maps/*',
