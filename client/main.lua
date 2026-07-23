@@ -19,19 +19,6 @@ QBCore.Functions.TriggerCallback = function(name, cb, ...)
     TriggerServerEvent('rts:standalone:triggerCallback', name, RequestId, ...)
 end
 
-CinematicMode = {
-    active = false,
-    cam = nil,
-    speed = 0.5,
-    rotSpeed = 2.5,
-    fov = 50.0,
-    -- THE BOOKMARKS
-    oldPos = nil,
-    oldPitch = nil,
-    oldHeading = nil,
-    oldHeight = nil
-}
-
 -- Game State
 GameState = {
     deployedPlatoons = {}, -- NEW: Track alive platoons groups
@@ -261,18 +248,7 @@ AddEventHandler('onResourceStop', function(resourceName)
     -- [[ END FIX ]] --
 
     RestoreEnvironment()
-    ResetGuns()
     FullPlayerReset()
-end)
-
--- Map Editor resource stop handler
-AddEventHandler('onResourceStop', function(resourceName)
-    if GetCurrentResourceName() ~= resourceName then return end
-
-    -- If editor was active, clean up
-    if MapEditor.active then
-        CleanupEditorEntities()
-    end
 end)
 
 function GetTableSize(t)

@@ -47,6 +47,4 @@ files {
     'stream/*',
 }
 
-data_file 'DLC_ITYP_REQUEST' 'stream/desert_map.ytyp'
-
 lua54 'yes'

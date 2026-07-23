@@ -569,8 +569,6 @@ function CleanupMatch(preservePlayer)
     
     DebugPrint("Match cleaned up")
   --  if not preservePlayer then FullPlayerReset() end
-   
-    ResetGuns()
 end
 
 function UpdateResourcesUI()

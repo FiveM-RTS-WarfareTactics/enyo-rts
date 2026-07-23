@@ -508,109 +508,6 @@ RegisterNUICallback('leaveMatchmaking', function(data, cb)
     cb({ success = true })
 end)
 
-RegisterNUICallback('editorAction', function(data, cb)
-    if not MapEditor.active then return cb('ok') end
-    
-    local action = data.action
-
-    -- Placement & Clicks
-    if action == 'CLICK_LEFT' then
-        if MapEditor.currentPreview then ConfirmPlacement() end
-    elseif action == 'CLICK_RIGHT' then
-        if MapEditor.currentPreview then 
-            DeleteEntity(MapEditor.currentPreview)
-            MapEditor.currentPreview = nil
-            MapEditor.pickedUpIndex = nil
-        end
-
-    -- Shift State (For Vertical Movement)
-    elseif action == 'SHIFT_DOWN' then shiftPressed = true
-    elseif action == 'SHIFT_UP' then shiftPressed = false
-
-    -- Rotation
-    elseif action == 'ROTATE_LEFT' and MapEditor.currentPreview then
-        SetEntityHeading(MapEditor.currentPreview, GetEntityHeading(MapEditor.currentPreview) + 5.0)
-    elseif action == 'ROTATE_RIGHT' and MapEditor.currentPreview then
-        SetEntityHeading(MapEditor.currentPreview, GetEntityHeading(MapEditor.currentPreview) - 5.0)
-
-    -- Zooming
-    elseif action == 'ZOOM_IN' then GameState.cameraHeight = GameState.cameraHeight - 5.0
-    elseif action == 'ZOOM_OUT' then GameState.cameraHeight = GameState.cameraHeight + 5.0
-    
-    -- Tools
-    elseif action == 'RESET_HEIGHT' then MapEditor.currentVerticalOffset = 0.0
-    elseif action == 'DELETE' then
-        local sw, sh = GetActiveScreenResolution()
-        local mx, my = GetNuiCursorPosition()
-        local worldPos = GetWorldCoordFromScreen(mx/sw, my/sh)
-        local searchPos = worldPos or GetCamCoord(GameState.camera)
-        local idx = GetClosestPlacedObjectIndex(searchPos, 15.0)
-
-        if idx then
-            if DoesEntityExist(MapEditor.placedObjects[idx].handle) then
-                DeleteEntity(MapEditor.placedObjects[idx].handle)
-            end
-            table.remove(MapEditor.placedObjects, idx)
-            PlaySoundFrontend(-1, "DELETE", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-        end
-    elseif action == 'EXIT' then ExitAndPrintMap()
-    
-    -- Object Selection (Pick Up / Clone)
-    elseif action == 'PICKUP' or action == 'CLONE' then
-        local mx, my = GetNuiCursorPosition()
-        local sw, sh = GetActiveScreenResolution()
-        local worldPos = GetWorldCoordFromScreen(mx/sw, my/sh)
-        local idx = GetClosestPlacedObjectIndex(worldPos or GetCamCoord(GameState.camera), 10.0)
-        
-        if idx and not MapEditor.currentPreview then
-            local targetData = MapEditor.placedObjects[idx]
-            
-            if action == 'PICKUP' then
-                MapEditor.pickedUpIndex = idx
-                MapEditor.currentPreview = targetData.handle
-                MapEditor.currentModelName = targetData.model
-                
-                -- Sync positioning variables immediately to stop jitter
-                MapEditor.currentBasePos = targetData.pos
-                MapEditor.currentVerticalOffset = 0.0
-                
-                SetEntityAlpha(targetData.handle, 150, false)
-                SetEntityCollision(targetData.handle, false, false)
-            else 
-                -- CLONE LOGIC
-                MapEditor.currentModelName = targetData.model
-                local hash = GetHashKey(targetData.model)
-                RequestModel(hash)
-                while not HasModelLoaded(hash) do Wait(0) end
-                
-                -- 1. Create the new entity
-                local newEnt = IsModelAVehicle(hash) and 
-                    CreateVehicle(hash, targetData.pos.x, targetData.pos.y, targetData.pos.z, targetData.heading, true, true) or 
-                    CreateObject(hash, targetData.pos.x, targetData.pos.y, targetData.pos.z, true, true, false)
-                
-                -- 2. COPY THE HEADING IMMEDIATELY
-                SetEntityHeading(newEnt, targetData.heading)
-                
-                -- 3. Set preview state
-                MapEditor.currentPreview = newEnt
-                
-                -- 4. CRITICAL: Sync these to the target's current position so it doesn't jump to camera
-                MapEditor.currentBasePos = targetData.pos
-                MapEditor.currentVerticalOffset = 0.0
-                
-                SetEntityAlpha(newEnt, 150, false)
-                SetEntityCollision(newEnt, false, false)
-                FreezeEntityPosition(newEnt, true)
-            end
-        end
-    end
-    cb('ok')
-end)
-
-RegisterNUICallback('editorKey', function(data, cb)
-    cb('ok')
-end)
-
 RegisterNUICallback('disconnectPlayer', function(data, cb)
     TriggerServerEvent('rts:disconnectPlayer')
     cb('ok')
@@ -764,7 +661,9 @@ RegisterNetEvent('rts:startMatch', function(data)
         StartObjectiveSystem()
         StartFogOfWarSystem() -- <--- ADD THIS
         SpawnMapDecorations(GameState.currentMap)
-        BoostGuns()
+        if GetResourceState('rts-weapons') == 'started' then
+            exports['rts-weapons']:ApplyWeaponModifiers()
+        end
    --     TempChangeMap()
         WreckScanner(map.center, map.range)
         StartEnvironmentLock()
