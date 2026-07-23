@@ -20,7 +20,6 @@ client_scripts {
     'client/rendering.lua',
     'client/selection.lua',
     'client/units.lua',
-    'client/editable-main.lua',
 }
 
 server_scripts {
@@ -31,7 +30,6 @@ server_scripts {
     'server/match.lua',
     'server/matchmaking.lua',
     'server/commands.lua',
-    'server/editable-main.lua',
 }
 
 loadscreen 'html/index.html'
