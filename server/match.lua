@@ -6,19 +6,10 @@
 local bucketCounter = 100
 
 function GetAvailableBucket()
-    local start = bucketCounter
-    repeat
-        if not GameBuckets[bucketCounter] then
-            GameBuckets[bucketCounter] = true
-            local id = bucketCounter
-            bucketCounter = bucketCounter + 1
-            if bucketCounter > 9000 then bucketCounter = 100 end
-            return id
-        end
-        bucketCounter = bucketCounter + 1
-        if bucketCounter > 9000 then bucketCounter = 100 end
-    until bucketCounter == start
-    return 9001 -- all 8901 buckets in use (extremely unlikely)
+    local id = bucketCounter
+    bucketCounter = bucketCounter + 1
+    if bucketCounter > 9000 then bucketCounter = 100 end
+    return id
 end
 
 function ReleaseBucket(bucket)
