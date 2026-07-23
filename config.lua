@@ -1,64 +1,21 @@
 Config = {}
 
 -------------------------------------------------------------------------------
---  SERVER FRAMEWORK & CORE
+--  SERVER
 -------------------------------------------------------------------------------
--- Which system is your server running?
--- Options: "QB" (QBCore), "ESX" (ESX), "VRP", or "Standalone" (No framework)
-Config.Framework = "Standalone" 
-
--- Set to true if you need to see error messages in your F8 console.
--- Keep this 'true' while setting up, set to 'false' when you are done.
 Config.DebugMode = true
 
--------------------------------------------------------------------------------
---  DEDICATED RTS MODE (WARNING: READ CAREFULLY)
--------------------------------------------------------------------------------
--- If this is 'true':
--- 1. The RTS game opens automatically when a player connects.
--- 2. If they click "Close", they are kicked from the server.
--- USE CASE: Only use 'true' if this server is ONLY for playing RTS matches.
--- For a normal Roleplay server, keep this 'false'.
+-- Internal flags (do not modify)
+Config.Framework = "Standalone"
 Config.DedicatedServerMode = true
-
--------------------------------------------------------------------------------
---  HOW TO OPEN THE MENU
--------------------------------------------------------------------------------
--- Choose how players access the RTS interface. You can enable multiple options.
-
--- 1. COMMAND: Players type /rts in chat to open.
-Config.UseCommand = true           
-
--- 2. KEY MAPPING: Binds a specific key in their FiveM settings (Esc -> Keybindings).
+Config.UseCommand = true
 Config.UseKeyMapping = false
-
--- 3. INTERACTION POINTS: Players walk to a specific location and press 'E'.
--- Note: This requires the 'Config.Locations' list below to be set up.
-Config.UseKeybind = false           
-
--- 4. THIRD EYE (TARGETING):
--- If you use ox_target or qb-target, set the relevant option to 'true'.
--- Players will Alt-Eye specific computer props to open the menu.
-Config.UseOxTarget = false          -- Set 'true' for Ox_Target
-Config.UseQbTarget = false          -- Set 'true' for QB-Target
-
--------------------------------------------------------------------------------
---  LOCATIONS & PROPS
--------------------------------------------------------------------------------
--- [For Config.UseKeybind]
--- List the coordinates where players can stand and press 'E'.
--- Format: vector3(x, y, z)
-Config.Locations = {
-    vector3(123.45, -567.89, 30.00), -- Location 1
-    vector3(-456.78, 987.65, 25.50), -- Location 2
-}
-
--- [For Config.UseOxTarget / Config.UseQbTarget]
--- These are the object names that the "Third Eye" will look for.
--- If a player looks at a 'prop_pc_01', the option to open RTS will appear.
-Config.ComputerModels = {
-    'prop_pc_01',
-}
+Config.UseKeybind = false
+Config.UseOxTarget = false
+Config.UseQbTarget = false
+Config.Locations = {}
+Config.ComputerModels = {}
+Config.Notifications = { Success = "success", Error = "error", Info = "primary", Warning = "warning" }
 
 -------------------------------------------------------------------------------
 --  GAMEPLAY MATCH SETTINGS
@@ -692,9 +649,8 @@ Config.Maps = {
 
 -- Rewards & Economy
 Config.Rewards = {
-    cashRewards = false, 
-    Victory = { cash = { min = 5000, max = 10000 }, xp = 1000 },
-    Defeat = { cash = { min = 1000, max = 3000 }, xp = 250 }
+    Victory = { xp = 1000 },
+    Defeat  = { xp = 250 }
 }
 
 -- Lobby System
@@ -704,18 +660,8 @@ Config.Lobby = {
     MaxLobbies = 100,
 }
 
--- Notifications
-Config.Notifications = {
-    Success = "success",
-    Error = "error",
-    Info = "primary",
-    Warning = "warning"
-}
-
 -- Keybinds
 Config.Keys = {
-    BindKeys            = false,
-    OpenMenu            = "F5",
     SelectAllUnits      = "SPACE",
     SelectInfantry      = "NUMPAD1",
     SelectVehicles      = "NUMPAD2",
