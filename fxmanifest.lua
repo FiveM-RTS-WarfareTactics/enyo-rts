@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'EnyoScripts'
-description 'Enyo RTS - Standalone Real-Time Strategy Game Mode'
+description 'Enyo RTS - Tactical Warfare Game Mode'
 version '2.0.0'
 
 shared_scripts {
@@ -12,40 +12,16 @@ shared_scripts {
 
 client_scripts {
     'client/main.lua',
-    'client/camera.lua',
-    'client/units.lua',
-    'client/selection.lua',
-    'client/commands.lua',
-    'client/rendering.lua',
-    'client/ai_brain.lua',
-    'client/environment.lua',
-    'client/nui_bridge.lua',
-    'client/dedicated.lua',
-}
-
-dependencies {
-    'rts-weapons',
-    'oxmysql',
+    'client/editable-main.lua',
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/main.lua',
-    'server/database.lua',
-    'server/lobby.lua',
-    'server/match.lua',
-    'server/objectives.lua',
-    'server/matchmaking.lua',
-    'server/cpu.lua',
-    'server/economy.lua',
-    'server/discord.lua',
-    'server/anticheat.lua',
-    'server/exports.lua',
-    'server/commands.lua',
+    'server/editable-main.lua',
 }
 
 loadscreen 'html/index.html'
-
 ui_page 'html/index.html'
 
 files {
@@ -57,6 +33,9 @@ files {
     'html/images/units/*',
     'html/images/maps/*',
     'html/sounds/*',
+    'stream/*',
 }
+
+data_file 'DLC_ITYP_REQUEST' 'stream/desert_map.ytyp'
 
 lua54 'yes'
