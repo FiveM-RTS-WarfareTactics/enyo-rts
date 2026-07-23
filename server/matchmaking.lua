@@ -8,7 +8,7 @@ RegisterNetEvent('rts:joinMatchmaking', function()
     
     -- 1. Validation: Is player already in a lobby/match?
     if PlayerStates[src] and PlayerStates[src].lobbyId then
-        TriggerClientEvent('QBCore:Notify', src, "Cannot queue while in a lobby", "error")
+        TriggerClientEvent('rts:nuiNotify', src, { message = "Cannot queue while in a lobby", type = "error" })
         return
     end
 

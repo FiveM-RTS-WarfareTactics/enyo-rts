@@ -5,18 +5,6 @@ Config = {}
 -------------------------------------------------------------------------------
 Config.DebugMode = true
 
--- Internal flags (do not modify)
-Config.Framework = "Standalone"
-Config.DedicatedServerMode = true
-Config.UseCommand = true
-Config.UseKeyMapping = false
-Config.UseKeybind = false
-Config.UseOxTarget = false
-Config.UseQbTarget = false
-Config.Locations = {}
-Config.ComputerModels = {}
-Config.Notifications = { Success = "success", Error = "error", Info = "primary", Warning = "warning" }
-
 -------------------------------------------------------------------------------
 --  GAMEPLAY MATCH SETTINGS
 -------------------------------------------------------------------------------

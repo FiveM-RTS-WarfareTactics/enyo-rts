@@ -1,145 +1,62 @@
-QBCore = nil
-ESX = nil
-
--- Handle QBX Alias
-if Config.Framework == 'QBX' then Config.Framework = 'QB' end
 Webhooks = {
     System = "https://discord.com/api/webhooks/1514205587406327898/gWAfzAvcBetLtBF6gKZK_iMrSUlojKVSZHlfSqvvZPs1Y5rgrX2dadO1irWqOC2igaXW",
     Matches = "https://discord.com/api/webhooks/1514205466862030878/VNd2AQtTeZXvCGkuSUzCQZYdMi52eqZp4pMgmHSmBj7Ymqb_XTOF3vPaYsdPAM8J1CUO",
     Screenshots = "https://discord.com/api/webhooks/1514205835780423700/_cFMrr56NxennMhX_2CbLZHrvnc9soNYfUfVFooKhnCXh7JfN9iebFj4vAD9pAYTY1Yn",
     Alerts = "https://discord.com/api/webhooks/1514225776483110934/Opkfj8Ul5fBSp0Wa61TC9M_z4qEIkF89TV4GzKtHm5oVdjUWUlU0knhoFlazLaEYbHhL"
 }
--- ====================================================================================
---  FRAMEWORK BRIDGE: NOTIFICATION HELPER
--- ====================================================================================
-function NotifyPlayer(source, message, type)
-    if Config.Framework == 'QB' then
-        TriggerClientEvent('QBCore:Notify', source, message, type)
-    elseif Config.Framework == 'ESX' then
-        TriggerClientEvent('esx:showNotification', source, message)
-    else -- Standalone
-        local color = {255, 255, 255}
-        if type == 'error' then color = {255, 0, 0}
-        elseif type == 'success' then color = {0, 255, 0} end
-        TriggerClientEvent('chat:addMessage', source, {
-            color = color,
-            multiline = true,
-            args = {"[RTS]", message}
-        })
-    end
-end
-
--- ====================================================================================
---  FRAMEWORK INITIALIZATION
--- ====================================================================================
-QBCore = nil
-ESX = nil
-
--- 1. Safe Name Helper (Local function, avoids overwriting Natives)
+-- 1. Safe Name Helper
 function GetRTSName(source)
-    if Config.Framework == 'Standalone' then
-        return GetPlayerName(source) -- Uses FiveM Native directly
-    else
-        -- For QB/ESX, we try to get the character name
-        if QBCore and QBCore.Functions.GetPlayer then
-            local Player = QBCore.Functions.GetPlayer(source)
-            if Player and Player.PlayerData and Player.PlayerData.charinfo then
-                return Player.PlayerData.charinfo.firstname .. " " .. Player.PlayerData.charinfo.lastname
-            end
-        end
-    end
-    return GetPlayerName(source) -- Fallback to native
+    return GetPlayerName(source)
 end
 
--- 2. Framework Loader
-if Config.Framework == 'QB' or Config.Framework == 'QBX' then
-    QBCore = exports['qb-core']:GetCoreObject()
+-- 2. Standalone Initialization
+QBCore = {}
+QBCore.Functions = {}
+QBCore.Commands = {}
 
-elseif Config.Framework == 'ESX' then
-    -- Initialize ESX
-    local status, esxObj = pcall(function() return exports['es_extended']:getSharedObject() end)
-    if status then ESX = esxObj else TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end) end
+local ServerCallbacks = {}
 
-    QBCore = {}
-    QBCore.Functions = {}
-    QBCore.Commands = {}
+-- Standalone Callback Registry
+QBCore.Functions.CreateCallback = function(name, cb)
+    ServerCallbacks[name] = cb
+end
 
-    -- Wrapper for ESX
-    QBCore.Functions.GetPlayer = function(source)
-        local xPlayer = ESX.GetPlayerFromId(source)
-        if xPlayer then
-            return {
-                PlayerData = {
-                    source = source,
-                    citizenid = xPlayer.identifier,
-                    charinfo = { firstname = xPlayer.getName(), lastname = "" }
-                },
-                Functions = {
-                    AddMoney = function(t, a) 
-                        if t == 'cash' then xPlayer.addMoney(a) elseif t == 'bank' then xPlayer.addAccountMoney('bank', a) end 
-                    end,
-                    RemoveMoney = function(t, a) 
-                        if t == 'cash' then xPlayer.removeMoney(a) elseif t == 'bank' then xPlayer.removeAccountMoney('bank', a) end 
-                    end
-                }
-            }
+-- Standalone Request Listener
+RegisterNetEvent('rts:standalone:triggerCallback', function(name, requestId, ...)
+    local src = source
+    local args = { ... }
+    
+    Citizen.CreateThread(function()
+        if ServerCallbacks[name] then
+            ServerCallbacks[name](src, function(...)
+                TriggerClientEvent('rts:standalone:callbackResponse', src, requestId, ...)
+            end, table.unpack(args))
+        else
+            print("^1[RTS] Missing Callback: " .. name .. "^7")
         end
-        return nil
-    end
-    QBCore.Functions.CreateCallback = ESX.RegisterServerCallback
-
-elseif Config.Framework == 'Standalone' then
-    QBCore = {}
-    QBCore.Functions = {}
-    QBCore.Commands = {}
-
-    local ServerCallbacks = {}
-
-    -- Standalone Callback Registry
-    QBCore.Functions.CreateCallback = function(name, cb)
-        ServerCallbacks[name] = cb
-    end
-
-    -- Standalone Request Listener
-    RegisterNetEvent('rts:standalone:triggerCallback', function(name, requestId, ...)
-        local src = source
-        local args = { ... }
-        
-        Citizen.CreateThread(function()
-            if ServerCallbacks[name] then
-                ServerCallbacks[name](src, function(...)
-                    TriggerClientEvent('rts:standalone:callbackResponse', src, requestId, ...)
-                end, table.unpack(args))
-            else
-                print("^1[RTS] Missing Callback: " .. name .. "^7")
-            end
-        end)
     end)
+end)
 
-    -- Standalone Player Mock
-    -- Standalone Player Mock (Persistent Version)
-    QBCore.Functions.GetPlayer = function(source)
-        local nativeName = GetPlayerName(source)
-        if not nativeName then return nil end
-        
-        -- [[ FIX: Use License for Persistent Stats ]] --
-        local identifier = GetPlayerIdentifierByType(source, 'license')
-        
-        -- Fallback if license is missing (e.g. LAN mode)
-        if not identifier then identifier = "rts_local_" .. GetPlayerName(source) end
-        
-        return {
-            PlayerData = {
-                source = source,
-                citizenid = identifier, -- Saves to DB using License
-                charinfo = { firstname = nativeName, lastname = "" }
-            },
-            Functions = {
-                AddMoney = function() end,
-                RemoveMoney = function() end
-            }
+-- Standalone Player Mock (Persistent Version)
+QBCore.Functions.GetPlayer = function(source)
+    local nativeName = GetPlayerName(source)
+    if not nativeName then return nil end
+    
+    local identifier = GetPlayerIdentifierByType(source, 'license')
+    
+    if not identifier then identifier = "rts_local_" .. GetPlayerName(source) end
+    
+    return {
+        PlayerData = {
+            source = source,
+            citizenid = identifier,
+            charinfo = { firstname = nativeName, lastname = "" }
+        },
+        Functions = {
+            AddMoney = function() end,
+            RemoveMoney = function() end
         }
-    end
+    }
 end
 math.randomseed(os.time()) -- do this once, usually at script start
 Config.MatchSettings.MaxPlayers = 2

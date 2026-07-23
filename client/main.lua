@@ -1,64 +1,22 @@
-QBCore = nil
+QBCore = {}
+QBCore.Functions = {}
 
--- Handle QBX Alias
-if Config.Framework == 'QBX' then Config.Framework = 'QB' end
+-- [[ STANDALONE BRIDGE ]] --
+local RequestId = 0
+local ClientCallbacks = {}
 
-if Config.Framework == 'QB' then
-    QBCore = exports['qb-core']:GetCoreObject()
-
-elseif Config.Framework == 'ESX' then
-    -- Make sure ESX is initialized
-    
-    QBCore = {}
-    QBCore.Functions = {}
-
-    -- Mapper: TriggerCallback
-    QBCore.Functions.TriggerCallback = function(name, cb, ...)
-        ESX.TriggerServerCallback(name, cb, ...)
+RegisterNetEvent('rts:standalone:callbackResponse')
+AddEventHandler('rts:standalone:callbackResponse', function(reqId, ...)
+    if ClientCallbacks[reqId] then
+        ClientCallbacks[reqId](...)
+        ClientCallbacks[reqId] = nil
     end
+end)
 
-    -- Mapper: GetClosestPlayer
-    QBCore.Functions.GetClosestPlayer = function()
-        return ESX.Game.GetClosestPlayer()
-    end
-
-    -- Mapper: Notify (CRITICAL FIX: Script calls QBCore.Functions.Notify)
-    QBCore.Functions.Notify = function(text, type)
-        -- Map QB types to ESX colors if needed, or just send text
-        ESX.ShowNotification(text)
-    end
-
-elseif Config.Framework == 'Standalone' then
-    QBCore = {}
-    QBCore.Functions = {}
-
-    QBCore.Functions.Notify = function(text, type)
-        BeginTextCommandThefeedPost("STRING")
-        AddTextComponentSubstringPlayerName(text)
-        EndTextCommandThefeedPostTicker(false, true)
-    end
-
-    QBCore.Functions.GetClosestPlayer = function() return -1, -1 end
-
-    -- [[ STANDALONE BRIDGE ]] --
-    -- [[ STANDALONE BRIDGE ]] --
-    local RequestId = 0
-    local ClientCallbacks = {}
-
-    RegisterNetEvent('rts:standalone:callbackResponse')
-    AddEventHandler('rts:standalone:callbackResponse', function(reqId, ...)
-        if ClientCallbacks[reqId] then
-            ClientCallbacks[reqId](...)
-            ClientCallbacks[reqId] = nil
-        end
-    end)
-
-    -- Send EVERYTHING to the server. No faking it.
-    QBCore.Functions.TriggerCallback = function(name, cb, ...)
-        RequestId = RequestId + 1
-        ClientCallbacks[RequestId] = cb
-        TriggerServerEvent('rts:standalone:triggerCallback', name, RequestId, ...)
-    end
+QBCore.Functions.TriggerCallback = function(name, cb, ...)
+    RequestId = RequestId + 1
+    ClientCallbacks[RequestId] = cb
+    TriggerServerEvent('rts:standalone:triggerCallback', name, RequestId, ...)
 end
 
 CinematicMode = {
@@ -158,29 +116,17 @@ end
 
 -- Initialize
 CreateThread(function()
-    while not QBCore do
-        Wait(100)
-        QBCore = exports['qb-core']:GetCoreObject()
-    end
-    
     DebugPrint("Tactical RTS Client Initializing...")
     
-    -- Register commands
-    
-   
-    
-    -- Register unit selection commands
     RegisterCommand('rtsselectall', SelectAllUnits, false)
     RegisterCommand('rtsselectinfantry', function() SelectUnitsByCategory('infantry') end, false)
     RegisterCommand('rtsselectvehicles', function() SelectUnitsByCategory('vehicles') end, false)
     RegisterCommand('rtsselecthelicopters', function() SelectUnitsByCategory('helicopters') end, false)
     DebugPrint(json.encode(Config))
-    if Config.Keys.BindKeys then
     RegisterKeyMapping('rtsselectall', 'Select All Units', 'keyboard', Config.Keys.SelectAllUnits)
     RegisterKeyMapping('rtsselectinfantry', 'Select Infantry', 'keyboard', Config.Keys.SelectInfantry)
     RegisterKeyMapping('rtsselectvehicles', 'Select Vehicles', 'keyboard', Config.Keys.SelectVehicles)
     RegisterKeyMapping('rtsselecthelicopters', 'Select Helicopters', 'keyboard', Config.Keys.SelectHelicopters)
-    end
     DebugPrint("RTS Client initialized successfully")
     SetupRelationshipGroups()
 end)

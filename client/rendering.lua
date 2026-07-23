@@ -312,7 +312,7 @@ function StartMatch(data)
     -- Play match start sound
     PlaySoundFrontend(-1, Config.Sounds.MatchStart, "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
     
-    QBCore.Functions.Notify("Match started! Good luck, Commander!", Config.Notifications.Success)
+    SendNUIMessage({action = 'showNotification', message = "Match started! Good luck, Commander!", type = "success"})
     DebugPrint("Match started - Team: " .. data.team .. ", Map: " .. map.name)
     StartHitboxTracker()
     StartSelectionRenderer()
@@ -862,9 +862,7 @@ function FullPlayerReset()
     local ped = PlayerPedId()
     DebugPrint("Starting Full Player Reset...")
 
-    if Config.DedicatedServerMode then
-        -- DEDICATED MODE: Keep them frozen, invisible, and floaty in the void
-        -- Random distance (using sqrt for even distribution inside the circle) and random angle
+    -- Random distance (using sqrt for even distribution inside the circle) and random angle
 local dist = 300.0 * math.sqrt(math.random())
 local angle = math.random() * (2 * math.pi)
 
@@ -874,31 +872,14 @@ local newY = 6331.23 + (dist * math.sin(angle))
 
 -- Teleport instantly to the new coords at Z = 1000.0
 SetEntityCoords(ped, newX, newY, 1000.0, false, false, false, false)
-        FreezeEntityPosition(ped, true)
-        SetEntityVisible(ped, false, false)
-        SetEntityCollision(ped, false, false)
-        SetEntityHasGravity(ped, false)
-        SetEntityInvincible(ped, true)
-        
-        PreMatchLocation = nil 
-        DebugPrint("^2[RTS] Dedicated Player returned to the Void.^7")
-    else
-        -- STANDARD MODE (RP Servers): Return them physically to where they were standing
-        if PreMatchLocation then
-            FreezeEntityPosition(ped, false)
-            SetEntityVisible(ped, true, false)
-            ResetEntityAlpha(ped)
-            SetEntityCollision(ped, true, true)
-            SetEntityInvincible(ped, false)
-            SetEntityHasGravity(ped, true)
-
-            SetEntityCoords(ped, PreMatchLocation.x, PreMatchLocation.y, PreMatchLocation.z, false, false, false, false)
-            PreMatchLocation = nil 
-            DebugPrint("^2[RTS] Player successfully returned to pre-match location.^7")
-        else
-            DebugPrint("^1[RTS ERROR] No PreMatchLocation found! Player is stranded.^7")
-        end
-    end
+    FreezeEntityPosition(ped, true)
+    SetEntityVisible(ped, false, false)
+    SetEntityCollision(ped, false, false)
+    SetEntityHasGravity(ped, false)
+    SetEntityInvincible(ped, true)
+    
+    PreMatchLocation = nil 
+    DebugPrint("^2[RTS] Dedicated Player returned to the Void.^7")
 
     -- Camera & Focus Cleanup
     RenderScriptCams(false, false, 0, true, true)

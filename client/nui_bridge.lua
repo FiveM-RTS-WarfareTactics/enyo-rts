@@ -67,7 +67,7 @@ RegisterNUICallback('leaveLobby', function(data, cb)
     GameState.isInLobby = false
     GameState.playerReady = false
     SendNUIMessage({ action = 'returnToMenu' })
-    QBCore.Functions.Notify("Left lobby", Config.Notifications.Info)
+    SendNUIMessage({action = 'showNotification', message = "Left lobby", type = "info"})
     cb({ success = true })
 end)
 
@@ -89,7 +89,7 @@ RegisterNUICallback('savePlatoons', function(data, cb)
     if data.platoons then
         GameState.platoons = data.platoons
         TriggerServerEvent('rts:savePlatoons', GameState.platoons)
-        QBCore.Functions.Notify("Platoons saved", Config.Notifications.Success)
+        SendNUIMessage({action = 'showNotification', message = "Platoons saved", type = "success"})
     end
     cb({ success = true })
 end)
@@ -452,14 +452,7 @@ RegisterNUICallback('surrenderMatch', function(data, cb)
 end)
 
 RegisterNUICallback('close', function(data, cb)
-    if Config.DedicatedServerMode then
-        -- If in Dedicated Mode, 'Close' means 'Disconnect'
-        TriggerServerEvent('rts:disconnectPlayer')
-    else
-        -- Standard Mode: Just hide UI
-        SetNuiFocus(false, false)
-        SendNUIMessage({ action = 'hideUI' })
-    end
+    TriggerServerEvent('rts:disconnectPlayer')
     cb('ok')
 end)
 
@@ -766,7 +759,7 @@ RegisterNetEvent('rts:startMatch', function(data)
     -- 9. Notifications (Wrapped in pcall to prevent crashes if Config is broken)
     pcall(function()
         PlaySoundFrontend(-1, "Beep_Green", "DLC_HEIST_HACKING_SNAKE_SOUNDS", true)
-        QBCore.Functions.Notify("Match Started!", "success")
+        SendNUIMessage({action = 'showNotification', message = "Match Started!", type = "success"})
         StartSelectionRenderer()
         StartObjectiveSystem()
         StartFogOfWarSystem() -- <--- ADD THIS
@@ -1004,9 +997,9 @@ AddEventHandler('rts:objectiveCaptured', function(data)
     -- [[ FIX END ]] --
 
     if data.team == GameState.team then
-        QBCore.Functions.Notify("Objective captured: " .. data.name, Config.Notifications.Success)
+        SendNUIMessage({action = 'showNotification', message = "Objective captured: " .. data.name, type = "success"})
     else
-        QBCore.Functions.Notify("Objective lost: " .. data.name, Config.Notifications.Error)
+        SendNUIMessage({action = 'showNotification', message = "Objective lost: " .. data.name, type = "error"})
     end
 end)
 
@@ -1046,9 +1039,9 @@ AddEventHandler('rts:endMatch', function(result)
     PlaySoundFrontend(-1, Config.Sounds.MatchEnd, "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
     
     if result.victory then
-        QBCore.Functions.Notify("VICTORY! " .. (result.reason or ""):upper(), "success", 10000)
+        SendNUIMessage({action = 'showNotification', message = "VICTORY! " .. (result.reason or ""):upper(), type = "success"})
     else
-        QBCore.Functions.Notify("DEFEAT! " .. (result.reason or ""):upper(), "error", 10000)
+        SendNUIMessage({action = 'showNotification', message = "DEFEAT! " .. (result.reason or ""):upper(), type = "error"})
     end
 
     if result.cashRewards then
@@ -1105,7 +1098,7 @@ RegisterNetEvent('rts:forceJoinLobby', function(data)
     
     -- 3. Audio/Visual Feedback
     PlaySoundFrontend(-1, "Menu_Accept", "Phone_SoundSet_Default", true)
-    QBCore.Functions.Notify("Match Found! Map: " .. (data.lobbyData.map or "Unknown"), "success")
+    SendNUIMessage({action = 'showNotification', message = "Match Found! Map: " .. (data.lobbyData.map or "Unknown"), type = "success"})
 end)
 
 RegisterNetEvent('rts:updateObjectives', function(data)

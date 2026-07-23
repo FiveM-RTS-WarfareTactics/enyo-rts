@@ -445,18 +445,18 @@ RegisterNetEvent('rts:spawnPlatoon', function(platoonIndex, position)
     
     if not platoon or not platoon.units or #platoon.units == 0 then
         DebugPrint("Invalid platoon spawn attempted for index: " .. tostring(platoonIndex))
-        TriggerClientEvent('QBCore:Notify', src, "Invalid platoon", 'error')
+        TriggerClientEvent('rts:nuiNotify', src, { message = "Invalid platoon", type = "error" })
         return
     end
 
     -- Check cooldown & Cost
     if playerData.platoonCooldowns and playerData.platoonCooldowns[platoonIndex] and playerData.platoonCooldowns[platoonIndex] > 0 then
-        TriggerClientEvent('QBCore:Notify', src, "Platoon on cooldown", Config.Notifications.Error)
+        TriggerClientEvent('rts:nuiNotify', src, { message = "Platoon on cooldown", type = "error" })
         return
     end
 
     if playerData.commandPoints < platoon.totalCost then 
-        NotifyPlayer(src, "Not enough command points", "error") 
+        TriggerClientEvent('rts:nuiNotify', src, { message = "Not enough command points", type = "error" }) 
         return 
     end
 
@@ -468,7 +468,7 @@ RegisterNetEvent('rts:spawnPlatoon', function(platoonIndex, position)
     end
 
     if currentPop + (platoon.unitCount or 1) > maxPop then
-        NotifyPlayer(src, "Unit population cap reached! (Max " .. maxPop .. ")", "error")
+        TriggerClientEvent('rts:nuiNotify', src, { message = "Unit population cap reached! (Max " .. maxPop .. ")", type = "error" })
         return
     end
 
@@ -814,13 +814,7 @@ function EndMatch(matchId, result)
 
             local cid = pData.identifier
             
-            if not isBot then
-                local Player = QBCore.Functions.GetPlayer(pid)
-                if Player and Config.Rewards.ShowCash then
-                    local range = isWinner and Config.Rewards.Victory.cash or Config.Rewards.Defeat.cash
-                    Player.Functions.AddMoney('cash', math.random(range.min, range.max))
-                end
-            end
+
 
             local enemyName = "Unknown Force"
             local enemyId = GetEnemyPlayer(pid, match)

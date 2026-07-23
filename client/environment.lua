@@ -73,7 +73,7 @@ function AdminEmergencyBreakState()
     
     DisplayRadar(true); DisplayHud(true)
     StopAudioScene("CHARACTER_CHANGE_IN_SKY_SCENE")
-    QBCore.Functions.Notify("RTS client engine state has been forcibly reset.", "success")
+    SendNUIMessage({action = 'showNotification', message = "RTS client engine state has been forcibly reset.", type = "success"})
 end
 
 exports('ForceClientReset', AdminEmergencyBreakState)
@@ -476,7 +476,7 @@ RegisterCommand("buildmap", function(source, args)
     DisplayHud(false)
     DisplayRadar(false)
     
-    QBCore.Functions.Notify("Map Builder Active. Radius: " .. MapEditor.radius, "success")
+    SendNUIMessage({action = 'showNotification', message = "Map Builder Active. Radius: " .. MapEditor.radius, type = "success"})
 end)
 
 -- Main Editor Loop

@@ -122,7 +122,7 @@ QBCore.Functions.CreateCallback('rts:joinLobby', function(source, cb, lobbyCode)
         end
     end
 
-    if lobby.host and lobby.host ~= src then NotifyPlayer(lobby.host, GetPlayerName(src) .. " joined", "info") end
+    if lobby.host and lobby.host ~= src then TriggerClientEvent('rts:nuiNotify', lobby.host, { message = GetPlayerName(src) .. " joined", type = "info" }) end
     
     cb({ success = true, hostName = lobby.hostName, isHost = isNewHost, lobbyData = payload })
 end)
@@ -140,7 +140,7 @@ RegisterNetEvent('rts:server:toggleBot', function(action)
     
     -- THE FIX: Prevent modifying bots if you are already ready!
     if state.ready then 
-        TriggerClientEvent('QBCore:Notify', src, "Unready before modifying the lobby.", "error")
+        TriggerClientEvent('rts:nuiNotify', src, { message = "Unready before modifying the lobby.", type = "error" })
         return 
     end
     
@@ -196,7 +196,7 @@ RegisterNetEvent('rts:leaveLobby', function()
             if lobby.host == src then
                 -- Host Left: Disband
                 for _, pid in ipairs(lobby.players) do
-                    TriggerClientEvent('QBCore:Notify', pid, "Host left the lobby", "error")
+                    TriggerClientEvent('rts:nuiNotify', pid, { message = "Host left the lobby", type = "error" })
                     PlayerStates[pid] = nil
                     TriggerClientEvent('rts:resetUI', pid)
                 end
