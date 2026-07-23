@@ -33,4 +33,9 @@ exports['enyo-rts']:GetGameState()
 ```
 
 ## License
-MIT
+Apache 2.0 — see [LICENSE](LICENSE)
+
+## Links
+- **Discord**: [discord.gg/PcBKN7VTHY](https://discord.gg/PcBKN7VTHY)
+- **Tebex Store**: [enyo.tebex.io](https://enyo.tebex.io/)
+- **GitHub**: [FiveM-RTS-WarfareTactics](https://github.com/FiveM-RTS-WarfareTactics)
