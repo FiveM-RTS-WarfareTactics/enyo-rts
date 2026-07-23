@@ -180,21 +180,7 @@ exports('ToggleHealthBars', function(state)
 end)
 
 exports('OpenRTSMenu', OpenRTSCentral)
-
 exports('ForceClientReset', AdminEmergencyBreakState)
-
-exports('HideRTSMenu', function()
-    SetNuiFocus(false, false)
-    SendNUIMessage({ action = 'hideUI' })
-end)
-
-exports('OpenRTSMenu', function()
-    if not GameState.isInMatch then
-        SendNUIMessage({ action = 'unhideUI' }) -- Force HTML back to visible
-        OpenRTSCentral() -- Populate everything
-    end
-end)
-
 exports('GetGameState', function() return GameState end)
 
 -- =======================================================================
@@ -202,51 +188,27 @@ exports('GetGameState', function() return GameState end)
 -- =======================================================================
 CpuBot = { active = false, commandPoints = 1500, cooldowns = {0,0,0,0,0}, platoons = {}, lastThink = 0, targetPlatoon = nil }
 
--- =======================================================================
--- DISABLE GTA IDLE CINEMATIC CAMERA
--- =======================================================================
+-- Framework Init
 CreateThread(function()
+    local ped = PlayerPedId()
+    SetEntityCoords(ped, 0.0, 0.0, 1000.0)
+    SetEntityVisible(ped, false)
+    SetEntityCollision(ped, false)
+    SetEntityHasGravity(ped, false)
+    SetEntityInvincible(ped, true)
+    FreezeEntityPosition(ped, true)
+
+    for i = 1, 15 do EnableDispatchService(i, false) end
+    SetMaxWantedLevel(0)
+
     while true do
-        InvalidateIdleCam()
-        InvalidateVehicleIdleCam()
-        Wait(1000) -- Check every second (highly optimized)
+        Wait(0)
+        SetDeepOceanScaler(0.0)
+        if GetPlayerWantedLevel(PlayerId()) ~= 0 then
+            SetPlayerWantedLevel(PlayerId(), 0, false)
+            SetPlayerWantedLevelNow(PlayerId(), false)
+        end
     end
-end)
-
-RegisterCommand('rts_breakglass', function() AdminEmergencyBreakState() end, true)
-
--- =======================================================================
--- MENU TOGGLING EXPORTS
--- =======================================================================
-exports('HideRTSMenu', function()
-    SetNuiFocus(false, false)
-    SendNUIMessage({ action = 'hideUI' })
-end)
-
-exports('OpenRTSMenu', function()
-    if not GameState.isInMatch then
-        SendNUIMessage({ action = 'unhideUI' })
-        OpenRTSCentral()
-    end
-end)
-
--- =======================================================================
--- ENVIRONMENT MANAGER
--- =======================================================================
-ManageEnvironment()
-
--- =======================================================================
--- RESOURCE STOP HANDLER
--- =======================================================================
-AddEventHandler('onResourceStop', function(resourceName)
-    if resourceName ~= GetCurrentResourceName() then return end
-
-    DebugPrint("[RTS] Resource stopping, restoring environment")
-    
-    CleanupMatch() 
-
-    RestoreEnvironment()
-    FullPlayerReset()
 end)
 
 function GetTableSize(t)

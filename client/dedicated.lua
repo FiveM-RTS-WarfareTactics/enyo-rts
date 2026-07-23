@@ -1,15 +1,6 @@
--- [[ RTS Framework - Player Containment & Auto-Start ]]
+-- [[ RTS Framework - Menu auto-open after loadscreen ]]
 
 CreateThread(function()
-    Wait(2000)
-
-    local ped = PlayerPedId()
-    SetEntityCoords(ped, 0.0, 0.0, 1000.0)
-    SetEntityVisible(ped, false)
-    SetEntityCollision(ped, false)
-    SetEntityHasGravity(ped, false)
-    FreezeEntityPosition(ped, true)
-
     while GetIsLoadingScreenActive() do Wait(100) end
     while IsPlayerSwitchInProgress() do Wait(100) end
 
