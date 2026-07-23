@@ -1,0 +1,715 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TACTICAL RTS ENYO UI</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <style>
+   
+    </style>
+</head>
+
+<body class="ui-root">    
+    <!-- Backgrounds & FX -->
+    <div class="fx-overlay"></div>
+    <div class="app-bg-image"></div>
+    <!--<div class="app-grid-overlay"></div>-->
+
+    <!-- Custom Cursor 
+    <div id="gameCursor" style="position:fixed; z-index:10001; pointer-events:none;">
+        <div style="width:4px; height:4px; background:var(--cyan); border-radius:50%;"></div>
+        <div style="width:40px; height:40px; border:1px solid var(--cyan); border-radius:50%; position:absolute; top:-18px; left:-18px;"></div>
+    </div>-->
+
+    <!-- Loading Screen -->
+<div id="loadingScreen" class="screen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: flex; background-color: #000;">    <div class="loading-backdrop"></div>
+
+    <div class="loading-content">
+        <div class="loading-title-group">
+            <img src="images/rtslogo2.png" class="game-logo-large" alt="TACTICAL WARFARE V">
+            <div class="sub-title">REAL-TIME STRATEGY</div>
+        </div>
+
+        <div class="loading-status-group">
+            <div class="spinner-ring"></div>
+            <div class="status-text" id="loadingStatusText">CONNECTING...</div>
+        </div>
+
+        <div class="loading-progress-track">
+            <div class="loading-bar-fill" id="loadingBarFill"></div>
+        </div>
+
+        <div class="loading-tip-group">
+            <div class="tip-label">ADVISORY</div>
+            <div class="tip-text" id="loadingTipText">
+                Manage your economy wisely. Running out of funds is a choice.
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Main Menu -->
+<div id="mainMenu" class="screen hidden" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;">        <div class="menu-container">
+            <div class="menu-header">
+                <div class="app-title">
+                    <img src="images/rtslogo1.png" class="game-logo-small" alt="LOGO">
+                </div>
+                <div class="game-subtitle">REAL-TIME STRATEGY</div>
+            </div>
+
+            <div class="menu-content">
+                <!-- Quick Match -->
+                <div class="menu-card tech-panel">
+                    <div class="card-header"><i class="fas fa-bolt"></i> QUICK DEPLOY</div>
+                    <div class="card-body">
+                        <p>Immediate combat drop into active warzones. </p>
+                        <button id="quickMatch" class="btn btn-primary">
+                            <span>FIND MATCH</span> <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <div class="matchmaking-info">
+                            <div class="queue-status">
+                                <span>ONLINE:</span> <span id="playerCount" class="mono gold-text">--</span>
+                            </div>
+                            <div class="estimated-time">
+                                <span>WAIT:</span> <span id="estTime" class="mono">CALCULATING</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operations -->
+                <div class="menu-card tech-panel">
+                    <div class="card-header"><i class="fas fa-globe"></i> OPERATIONS</div>
+                    <div class="card-body">
+    <p>Manage private lobbies.</p>
+    
+    <button id="createLobby" class="btn">CREATE LOBBY</button>
+    
+    <div style="margin-top: 20px;">
+        <div class="map-selector-carousel">
+            <button class="carousel-arrow" id="mapPrev">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <div class="carousel-viewport">
+                <div class="carousel-bg" id="carouselBg"></div>
+                
+                <div class="carousel-info">
+                    <div class="carousel-label">TARGET SECTOR</div>
+                    <div class="carousel-name" id="carouselMapName">LOADING...</div>
+                </div>
+            </div>
+
+            <button class="carousel-arrow" id="mapNext">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+    </div>
+    <div style="display: flex; gap: 5px;margin-top:auto;">
+            <input type="text" id="lobbyCodeInput" placeholder="ENTER CODE" style="flex: 1; padding: 12px; background: #000; border: 1px solid #333; color: white; text-transform: uppercase; font-family: var(--font-mono); font-size: 1.1rem;">
+            <button id="joinLobby" class="btn btn-primary btn-icon"><i class="fas fa-sign-in-alt"></i></button>
+        </div>
+</div>
+                </div>
+
+                <!-- Profile -->
+                <div class="menu-card tech-panel">
+                    <div class="card-header"><i class="fas fa-person-military-rifle"></i> COMMANDER</div>
+                    <div class="card-body">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <div id="commanderNameDisplay" class="gold-text" style="font-weight: 900; letter-spacing: 1px;">COMMANDER: LOADING...</div>
+
+                            <div id="profileLevelBadge" style="background: var(--gold); color: #000; padding: 2px 8px; font-weight: bold; border-radius: 2px;">LVL 1</div>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden;">
+                            <div id="profileXPBar" style="height: 100%; width: 0%; background: var(--gold);"></div>
+                        </div>
+                        <div class="mono" style="text-align: right; font-size: 0.9rem; color: var(--gold);"><span id="xpCurrent">0</span> / <span id="xpMax">200</span> XP</div>
+
+                        <div class="stats-grid">
+                            <div class="stat"><span class="stat-value-grid" id="statWins">0</span><span class="stat-label">WINS</span></div>
+                            <div class="stat"><span class="stat-value-grid" id="statKillsTotal">0</span><span class="stat-label">KILLS</span></div>
+                            <div class="stat"><span class="stat-value-grid" id="statMatches">0</span><span class="stat-label">OPS</span></div>
+                            <div class="stat"><span class="stat-value-grid" id="statScore">0</span><span class="stat-label">XP</span></div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: auto;">
+                            <button id="viewLeaderboard" class="btn btn-secondary" style="flex: 1;">RANKING</button>
+                            <button id="viewHistory" class="btn btn-secondary" style="flex: 1;">LOGS</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-footer">
+                <div class="server-info">
+                    <span><i class="fas fa-circle" style="color: var(--green); font-size: 0.6rem;"></i> SYSTEM ONLINE</span>
+                    <span>ACTIVE: <span id="activeBattles" class="gold-text">--</span></span>
+                    <span style="margin-left: 20px;">PING: <span id="serverPing" class="gold-text">--</span>ms</span>
+                </div>
+                <div class="controls-info">
+                    <button id="settingsBtn" class="btn btn-icon"><i class="fas fa-cog"></i></button>
+                    <button id="helpBtn" class="btn btn-icon"><i class="fas fa-question"></i></button>
+                    <button id="exitBtn" class="btn btn-icon btn-danger"><i class="fas fa-power-off"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lobby Screen -->
+    <div id="lobbyScreen" class="screen hidden">
+        <div class="lobby-container">
+            <header class="lobby-header">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="lobby-title"><i class="fas fa-users-cog gold-text"></i> TACTICAL OPS LOBBY</div>
+
+                    <div class="lobby-code-box" id="lobbyCodeContainer">
+                        <span id="lobbyCodeDisplay">------</span>
+                        <button id="copyCode"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div style="color: #888; font-size: 1rem; font-family: var(--font-head);">
+                        <span id="mapName" class="cyan-text">DESERT ARENA</span> <span style="margin:0 10px;">//</span> <span id="hostName" class="gold-text">COMMANDER</span>
+                    </div>
+
+                    <button id="leaveLobby" class="btn btn-danger" style="padding: 10px 20px;">ABORT</button>
+                </div>
+            </header>
+
+            <div class="lobby-content">
+                <!-- Players -->
+                <div class="tech-panel players-panel">
+                    <div style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--cyan); font-family: var(--font-head); font-size: 1.2rem;">
+                        SQUADRON <span id="playersCount" style="float:right; font-family: var(--font-mono);">0/2</span>
+                    </div>
+                    
+                    <div class="players-list" id="playersList"></div>
+                    
+                    <div id="hostBotControls" style="display: none; padding: 0 20px 15px 20px;">
+                        <button id="toggleBotBtn" class="btn btn-secondary" style="width: 100%; padding: 8px; font-size: 0.85rem;" data-action="add">
+                            <i class="fas fa-robot"></i> ADD A.I. COMMANDER
+                        </button>
+                    </div>
+
+                    <div style="padding: 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">STATUS</div>
+                        <div class="status-value gold-text" id="readyStatusText" style="font-family: var(--font-head); font-size: 1.2rem;">AWAITING COMMANDERS</div>
+                    </div>
+                </div>
+
+                <!-- Platoon Builder -->
+                <div class="tech-panel platoon-builder">
+                    <!-- Left: Unit Pool -->
+                    <div class="unit-pool">
+                        <div class="unit-categories"></div>
+                        <!-- Filled by JS -->
+                        <div class="units-list" id="unitsList"></div>
+                    </div>
+
+                    <!-- Right: Slots -->
+                    <div class="platoon-slots">
+                        <div class="slots-header">
+                            <span>DEPLOYMENT SLOTS</span>
+                            <span>PAYLOAD: <span id="totalWeight" class="gold-text">0</span> / <span id="maxWeight">10</span> <button id="clearAll" style="background:none; border:none; color:#f00; cursor:pointer; margin-left:10px;"><i class="fas fa-trash"></i></button></span>
+                        </div>
+                        <div class="slots-grid">
+                            <!-- Slots 1-5 -->
+                            <div class="platoon-slot" data-slot="1">
+                                <div class="slot-title">ALPHA</div>
+                                <div class="slot-content" id="slot1Content"></div>
+                                <div class="slot-footer"><span>W:<span id="slot1Weight">0</span></span><span>$<span id="slot1Cost">0</span></span>
+                                </div>
+                            </div>
+                            <div class="platoon-slot" data-slot="2">
+                                <div class="slot-title">BRAVO</div>
+                                <div class="slot-content" id="slot2Content"></div>
+                                <div class="slot-footer"><span>W:<span id="slot2Weight">0</span></span><span>$<span id="slot2Cost">0</span></span>
+                                </div>
+                            </div>
+                            <div class="platoon-slot" data-slot="3">
+                                <div class="slot-title">CHARLIE</div>
+                                <div class="slot-content" id="slot3Content"></div>
+                                <div class="slot-footer"><span>W:<span id="slot3Weight">0</span></span><span>$<span id="slot3Cost">0</span></span>
+                                </div>
+                            </div>
+                            <div class="platoon-slot" data-slot="4">
+                                <div class="slot-title">DELTA</div>
+                                <div class="slot-content" id="slot4Content"></div>
+                                <div class="slot-footer"><span>W:<span id="slot4Weight">0</span></span><span>$<span id="slot4Cost">0</span></span>
+                                </div>
+                            </div>
+                            <div class="platoon-slot" data-slot="5">
+                                <div class="slot-title">ECHO</div>
+                                <div class="slot-content" id="slot5Content"></div>
+                                <div class="slot-footer"><span>W:<span id="slot5Weight">0</span></span><span>$<span id="slot5Cost">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info/Controls -->
+                <div class="controls-panel">
+                    <div class="tech-panel" style="padding: 20px;">
+                        <div style="color: var(--cyan); margin-bottom: 15px; font-family: var(--font-head);">INTEL</div>
+                        <div class="map-preview" id="mapPreview">
+                            <div class="map-overlay">
+                                <div id="previewMapName">DESERT ARENA</div>
+                            </div>
+                        </div>
+                        <div class="map-details">
+                            <div class="detail-item"><i class="fas fa-bullseye"></i> OBJECTIVES: <span id="objectiveCount">3</span></div>
+                            <!--<div class="detail-item"><i class="fas fa-mountain"></i> TYPE: <span id="terrainType">DESERT</span></div>-->
+                            <div class="detail-item"><i class="fas fa-clock"></i> TIME: <span id="timeLimit">15:00</span></div>
+                        </div>
+                        <div class="mission-brief-box">
+                            <div class="brief-label">MISSION BRIEF</div>
+                            <div id="mapDescription" class="brief-text">
+                                Secure the oil fields to gain resource advantage. Heavy armor recommended for open terrain.
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 5%; height: 100%; display: flex; flex-direction: column; justify-content: flex-end;">
+                            <div id="readyIndicator" class="hidden"></div>
+                            <div id="countdownContainer" style="display: none; text-align: center; margin-top: 15px;  margin-bottom: 10%;">
+                                <div style="color: var(--gold); letter-spacing: 5px;">LAUNCH SEQUENCE</div>
+                                <div id="countdownTimer" style="font-size: 3rem; color: var(--red); font-family: var(--font-mono); font-weight: 700;">5</div>
+                            </div>
+                            <button id="readyToggle" class="btn btn-primary" style="width: 100%; height: 70px; font-size: 1.4rem; "><i class="fas fa-play-circle"></i><span>READY</span></button>
+
+                        </div>
+
+
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME UI -->
+    <div id="gameUI" class="screen hidden">
+        <div id="game-input-layer"></div>
+      
+
+
+        <div class="hud-header-container">
+              <div class="image-hud">
+                <div class="hud-side-bar left-wing">
+                    <div class="info-group">
+                        <span class="lbl">RESOURCES</span>
+                        <span class="val mono" id="cpValue">1500</span>
+                    </div>
+                </div>
+                <div class="hud-timer-box">
+                    
+                    <div class="info-group">
+                        <span class="val mono timer" id="timeValue">15:00</span>
+                    </div>
+                </div>
+                <div class="hud-side-bar right-wing">
+                   
+                    <div class="info-group">
+                        <span class="lbl">INCOME</span>
+                        <span class="val mono positive" id="incomeValue">+150</span>
+                    </div>
+                </div>
+
+              </div>
+
+            
+            
+                <!--
+            
+            <div class="header-right-actions">
+                <button  id="midGameSettings" class="btn btn-icon" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button id="helpBtn" class="btn btn-icon" title="Help">
+                    <i class="fas fa-question"></i>
+                </button>
+             
+            </div>-->
+        
+
+          
+
+            <div class="hud-corner-right">
+                <button id="midGameSettings" class="hud-settings-btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button id="helpBtn" class="hud-settings-btn">
+                    <i class="fas fa-question"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="quest-tracker-panel">
+            <div class="quest-header-row">
+                <span class="quest-label">OBJECTIVE STATUS</span>
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="quest-content">
+                <div class="quest-title" id="objectiveStatus">NEUTRAL ZONE</div>
+                <div class="quest-bar-bg">
+                    <div class="quest-bar-fill" id="objectiveProgress"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="airstrikeAlert" class="airstrike-alert hidden">
+            <div class="alert-content">
+                <div class="alert-icon">
+                    <i class="fas fa-fighter-jet"></i>
+                </div>
+                <div class="alert-info">
+                    <div class="alert-title">AIRSTRIKE ON STANDBY</div>
+                    <div class="alert-subtitle">SELECT TARGET IMMEDIATELY</div>
+                </div>
+                <div class="alert-timer">
+                    <span id="asTimerVal">10.0</span>s
+                </div>
+            </div>
+            <div class="alert-progress-bg">
+                <div class="alert-progress-fill" id="asProgress"></div>
+            </div>
+        </div>
+
+        <div class="hud-bottom-section">
+
+            <div class="bottom-left-area">
+                <div class="selection-info" id="selectionInfo">
+                    <div class="sel-icon-box"><i class="fas fa-crosshairs"></i></div>
+                    <div class="sel-data-col">
+                        <div class="sel-header">SELECTED UNITS</div>
+                        <div class="sel-health-bg">
+                            <div class="sel-health-fill" id="selectionHealth"></div>
+                        </div>
+                        <div class="sel-row">
+                            <div class="sel-count">x<span id="selectedCount">0</span></div>
+                            <div class="sel-perc mono"><span id="healthPercent">100</span></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                
+            </div>
+
+            <div class="bottom-center-area">
+               
+                <div class="platoon-dock">
+                    
+                    <div class="platoon-slots-container">
+                        
+                        <div class="quickbar-slot" data-slot="1">
+                            <div class="slot-bg"></div>
+                            <div class="slot-key">1</div>
+                            <div class="slot-inner">
+                                <div class="slot-icon"><i class="fas fa-chess-pawn"></i></div>
+                                <div class="slot-name">ALPHA</div>
+                                <div class="slot-cost" id="quickCost1">-</div>
+                            </div>
+                            <div class="slot-cooldown" id="cooldown1"></div>
+                            <div class="slot-icons-preview"></div>
+                        </div>
+
+                        <div class="quickbar-slot" data-slot="2">
+                            <div class="slot-bg"></div>
+                            <div class="slot-key">2</div>
+                            <div class="slot-inner">
+                                <div class="slot-icon"><i class="fas fa-chess-knight"></i></div>
+                                <div class="slot-name">BRAVO</div>
+                                <div class="slot-cost" id="quickCost2">-</div>
+                            </div>
+                            <div class="slot-cooldown" id="cooldown2"></div>
+                            <div class="slot-icons-preview"></div>
+                        </div>
+
+                        <div class="quickbar-slot" data-slot="3">
+                            <div class="slot-bg"></div>
+                            <div class="slot-key">3</div>
+                            <div class="slot-inner">
+                                <div class="slot-icon"><i class="fas fa-chess-bishop"></i></div>
+                                <div class="slot-name">CHARLIE</div>
+                                <div class="slot-cost" id="quickCost3">-</div>
+                            </div>
+                            <div class="slot-cooldown" id="cooldown3"></div>
+                            <div class="slot-icons-preview"></div>
+                        </div>
+
+                        <div class="quickbar-slot" data-slot="4">
+                            <div class="slot-bg"></div>
+                            <div class="slot-key">4</div>
+                            <div class="slot-inner">
+                                <div class="slot-icon"><i class="fas fa-chess-rook"></i></div>
+                                <div class="slot-name">DELTA</div>
+                                <div class="slot-cost" id="quickCost4">-</div>
+                            </div>
+                            <div class="slot-cooldown" id="cooldown4"></div>
+                            <div class="slot-icons-preview"></div>
+                        </div>
+
+                        <div class="quickbar-slot" data-slot="5">
+                            <div class="slot-bg"></div>
+                            <div class="slot-key">5</div>
+                            <div class="slot-inner">
+                                <div class="slot-icon"><i class="fas fa-chess-queen"></i></div>
+                                <div class="slot-name">ECHO</div>
+                                <div class="slot-cost" id="quickCost5">-</div>
+                            </div>
+                            <div class="slot-cooldown" id="cooldown5"></div>
+                            <div class="slot-icons-preview"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-right-area">
+                <div class="active-squads-box" id="activeSquadsPanel">
+                    
+                    <div class="deployed-list" id="deployedList">
+                        </div>
+                </div>
+                
+            </div>
+
+        </div>
+
+        <div id="selectionRectangle" class="hidden"></div>
+        
+        <div class="unit-tooltip" id="unitTooltip">
+            <div class="tooltip-header">
+                <div class="unit-name" id="tooltipName">ENYO SCRIPTS</div>
+                <div class="unit-health" id="tooltipHealth">VERSION 1.2.0</div>
+            </div>
+        </div>
+    </div>
+     <!-- Modals -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content tech-panel" style="background: var(--bg-glass); padding: 30px; border: 1px solid var(--cyan);">
+            <button class="close-modal" onclick="window.tacticalRTS.closeModal('settingsModal')" title="CLOSE SYSTEM">                <i class="fas fa-times"></i>
+            </button>
+            <h2 style="color: var(--gold); margin-bottom: 30px; font-family: var(--font-head); letter-spacing: 2px;">SYSTEM CONFIG</h2>
+            <div style="margin-bottom: 25px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label style="color: #fff; font-size: 0.9rem; font-family: var(--font-mono); text-transform: uppercase;">SFX VOLUME</label>
+                    <span style="color: var(--cyan); font-family: var(--font-mono); font-size: 0.9rem;"></span>
+                </div>
+                <input type="range" id="sfxVolume" min="0" max="100" value="50" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 40px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label style="color: #fff; font-size: 0.9rem; font-family: var(--font-mono); text-transform: uppercase;">MUSIC VOLUME</label>
+                </div>
+                <input type="range" id="musicVolume" min="0" max="100" style="width: 100%;">
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+                <button id="surrenderBtn" class="btn btn-danger hidden" style="border-color: var(--red);">
+                    <i class="fas fa-flag"></i> SURRENDER
+                </button>
+
+                <button id="saveSettings" class="btn btn-primary">APPLY</button>
+            </div>
+            
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal hidden">
+        <div class="modal-content tech-panel" style="width: 600px;">
+            <button class="close-modal" onclick="window.tacticalRTS.closeModal('helpModal')" title="CLOSE SYSTEM">                <i class="fas fa-times"></i>
+            </button>
+            <h2 style="color: var(--gold); margin-bottom: 25px; font-family: var(--font-head);">FIELD MANUAL</h2>
+            <div class="modal-body" style="font-size: 1.1rem; line-height: 1.6; color: #ccc;">
+                <!-- Content injected by JS -->
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 30px;">
+                <button id="closeHelp" class="btn btn-primary">ACKNOWLEDGED</button>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Result Screen -->
+    <div id="resultScreen" class="screen hidden">
+    <div class="result-backdrop"></div>
+
+    <div class="result-container">
+        
+        <div class="result-header">
+            <div class="result-icon-bg"><i class="fas fa-trophy"></i></div>
+            <h1 class="result-title" id="resultTitle">VICTORY</h1>
+            <div class="result-reason" id="resultSubtitle">ENEMY COMMANDER ELIMINATED</div>
+        </div>
+
+        <div class="result-body">
+            <div class="result-column progress-col">
+                <div class="col-title">FIELD PROMOTION</div>
+                
+                <div class="rank-display">
+                    <div class="rank-icon"><i class="fas fa-medal"></i></div>
+                    <div class="rank-info">
+                        <div class="rank-label">CURRENT RANK</div>
+                        <div class="rank-val">LVL <span id="resLevel">1</span></div>
+                    </div>
+                </div>
+
+                <div class="xp-section">
+                    <div class="xp-labels">
+                        <span>PROGRESS</span>
+                        <span class="mono"><span id="resXPCurrent">0</span> / <span id="resXPMax">1000</span> XP</span>
+                    </div>
+                    <div class="xp-track">
+                        <div class="xp-fill" id="resXPBar"></div>
+                    </div>
+                    <div class="xp-gain-text">
+                        +<span id="xpGainedDisplay">0</span> XP EARNED
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-column stats-col">
+                <div class="col-title">MISSION REPORT</div>
+                
+                <div class="stat-rows">
+                    <div class="stat-row">
+                        <div class="stat-icon"><i class="fas fa-crosshairs"></i></div>
+                        <div class="stat-name">HOSTILES NEUTRALIZED</div>
+                        <div class="stat-val" id="statKills">0</div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-icon"><i class="fas fa-skull"></i></div>
+                        <div class="stat-name">CASUALTIES SUSTAINED</div>
+                        <div class="stat-val" id="statLosses">0</div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-name">OPERATION DURATION</div>
+                        <div class="stat-val mono" id="statTime">00:00</div>
+                    </div>
+                    <div class="stat-row highlight">
+                        <div class="stat-icon"><i class="fas fa-star"></i></div>
+                        <div class="stat-name">TOTAL SCORE</div>
+                        <div class="stat-val" id="statObjectives">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-footer">
+            <button id="rematchBtn" class="btn btn-primary large-btn">
+                <i class="fas fa-sync-alt"></i> RE-DEPLOY
+            </button>
+            <button id="returnToMenuBtn" class="btn btn-secondary large-btn">
+                <i class="fas fa-sign-out-alt"></i> DISMISS
+            </button>
+        </div>
+    </div>
+</div>
+
+           
+
+    <!-- Leaderboard Screen -->
+    <div id="leaderboardScreen" class="screen hidden">
+        <div class="full-page-container tech-panel" style="display: flex; flex-direction: column;">
+
+            <div class="full-page-header">
+                <h2 class="gold-text">GLOBAL RANKING</h2>
+                <button class="btn btn-secondary" onclick="window.tacticalRTS.showScreen('mainMenu');">Back</button>
+
+            </div>
+
+            <div style="padding: 15px 20px; font-weight: 700; display: grid; grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr; color: #666; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <span></span><span>NAME</span><span>WINS</span><span>KILLS</span><span>SCORE</span>
+            </div>
+
+            <div id="leaderboardList" class="full-page-content" style="flex: 1;">
+            </div>
+
+
+
+        </div>
+        <!--<div class="footer-actions" style="padding: 30px 90px; display: flex; justify-content: flex-start;">
+            <button class="btn btn-secondary back-btn" onclick="window.tacticalRTS.showScreen('mainMenu');">
+                BACK
+            </button>
+        </div>-->
+    </div>
+
+
+    <!-- History Screen -->
+    <div id="historyScreen" class="screen hidden">
+        <div class="full-page-container tech-panel">
+            <div class="full-page-header">
+                <h2 class="cyan-text">COMBAT LOGS</h2>
+                <button class="btn btn-secondary" onclick="window.tacticalRTS.showScreen('mainMenu');">Back</button>
+            </div>
+            <div id="historyList" class="full-page-content history-list">
+                <div class="history-item win">
+                    <div class="history-info">
+                    <div class="history-map">NEON CITY</div>
+                    <div class="history-details">SECTOR: <strong>DELTA-9</strong></div>
+                </div>
+                <div class="history-result">
+                    <span class="label">MISSION STATUS</span>
+                    <span class="value">VICTORY</span>
+                </div>
+                <div class="history-stats">
+                    <span class="label">XP EARNED</span>
+                    <span class="value">+3,200</span>
+                </div>
+            </div>
+        </div>
+        <!--<div class="footer-actions" style="padding: 30px 90px; display: flex; justify-content: flex-start;">
+            <button class="btn btn-secondary back-btn" onclick="window.tacticalRTS.showScreen('mainMenu');">
+                BACK
+            </button>
+         </div>-->
+    </div>
+    </div>
+         
+   
+  
+
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <script src="js/modules/sound.js"></script>
+    <script src="js/modules/notify.js"></script>
+    <script src="js/modules/screens.js"></script>
+    <script src="js/modules/input.js"></script>
+    <script src="js/modules/platoon.js"></script>
+    <script src="js/modules/lobby.js"></script>
+    <script src="js/modules/game.js"></script>
+    <script src="js/modules/modals.js"></script>
+    <script src="js/app.js"></script>
+    <audio id="bgMusic" loop><source src="sounds/theme.mp3" type="audio/mpeg"></audio>
+    <!-- AI Matchmaking Prompt Modal -->
+   <!-- AI Matchmaking Prompt Modal -->
+    <div id="aiPromptModal" class="ai-modal-overlay hidden">
+        <div class="ai-modal-box">
+            <div class="ai-modal-header">
+                MATCHMAKING UPDATE
+            </div>
+            <div class="ai-modal-body">
+                <p>The queue is taking a while. Would you like to instantly deploy against the <strong>Advanced A.I. Commander</strong> instead?</p>
+            </div>
+            <div class="ai-modal-footer">
+                <button class="btn btn-secondary" onclick="window.tacticalRTS.declineAiMatch()">KEEP WAITING</button>
+                <button class="btn btn-primary" onclick="window.tacticalRTS.acceptAiMatch()">PLAY VS A.I.</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+</html>
