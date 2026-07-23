@@ -180,7 +180,6 @@ exports('ToggleHealthBars', function(state)
 end)
 
 exports('OpenRTSMenu', OpenRTSCentral)
-exports('ForceClientReset', AdminEmergencyBreakState)
 exports('GetGameState', function() return GameState end)
 
 -- =======================================================================

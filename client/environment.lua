@@ -1,48 +1,26 @@
 -- Weapon modifiers are handled by rts-weapons resource (auto-applies on start)
 
-function AdminEmergencyBreakState()
-    DebugPrint("^1[RTS ADMIN] Executing hard local state purge...^7")
-    
-    RenderScriptCams(false, false, 0, true, true)
+function ForceClientReset()
     if GameState.camera then DestroyCam(GameState.camera, false); GameState.camera = nil end
-    ClearFocus()
-    
-    -- DROP UI HOOKS
-    SetNuiFocus(false, false)
-    SetNuiFocusKeepInput(false)
-    SendNUIMessage({ action = 'hideUI' })
-    SendNUIMessage({ action = 'stopAirstrikeTimer' })
+    RenderScriptCams(false, true, 500, true, true)
 
-    -- RESTORE CONTROLS (This fixes the stuck mouse/keyboard)
-    EnableAllControlActions(0)
-    EnableControlAction(0, 1, true)
-    EnableControlAction(0, 2, true)
-    EnableControlAction(0, 24, true)
-    EnableControlAction(0, 25, true)
+    GameState.isInMatch = false
+    GameState.isInLobby = false
+    GameState.selectedUnits = {}
 
-    GameState.isInMatch = false; GameState.isInLobby = false
-    GameState.playerReady = false; GameState.selectedUnits = {}
-    matchLoopRunning = false
-    
     local ped = PlayerPedId()
-    FreezeEntityPosition(ped, false)
-    SetEntityVisible(ped, true, false)
-    ResetEntityAlpha(ped)
-    SetEntityCollision(ped, true, true)
-    SetEntityHasGravity(ped, true)
-    SetEntityInvincible(ped, false)
-    
-    local coords = GetEntityCoords(ped)
-    if coords.z > 500.0 then
-        SetEntityCoords(ped, 0.0, 0.0, 70.0, false, false, false, false)
-    end
-    
-    DisplayRadar(true); DisplayHud(true)
-    StopAudioScene("CHARACTER_CHANGE_IN_SKY_SCENE")
-    SendNUIMessage({action = 'showNotification', message = "RTS client engine state has been forcibly reset.", type = "success"})
+    SetEntityCoords(ped, 0.0, 0.0, 1000.0)
+    SetEntityVisible(ped, false)
+    SetEntityCollision(ped, false)
+    SetEntityHasGravity(ped, false)
+    SetEntityInvincible(ped, true)
+    FreezeEntityPosition(ped, true)
+
+    SendNUIMessage({ action = 'returnToMenu' })
+    OpenRTSCentral()
 end
 
-exports('ForceClientReset', AdminEmergencyBreakState)
+exports('ForceClientReset', ForceClientReset)
 
 -- Environment Lock System
 local OriginalEnvironment = {
