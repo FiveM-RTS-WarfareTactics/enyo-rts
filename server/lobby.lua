@@ -173,7 +173,7 @@ RegisterNetEvent('rts:server:toggleBot', function(action)
         if type(pid) == "number" then TriggerClientEvent('rts:updateLobby', pid, payload) end
     end
     
-    if #lobby.players == Config.MatchSettings.MaxPlayers and #lobby.readyPlayers == Config.MatchSettings.MaxPlayers then
+    if #lobby.players == 2 and #lobby.readyPlayers == 2 then
         lobby.status = "starting"
         for _, pid in ipairs(lobby.players) do
             if type(pid) == "number" then TriggerClientEvent('rts:startCountdown', pid, Config.Lobby.ReadyCheckDuration) end
@@ -253,7 +253,7 @@ RegisterNetEvent('rts:setReady', function(isReady)
             end
 
             -- START LOGIC
-            if lobby.status == "waiting" and #lobby.players == Config.MatchSettings.MaxPlayers and #lobby.readyPlayers == Config.MatchSettings.MaxPlayers then
+            if lobby.status == "waiting" and #lobby.players == 2 and #lobby.readyPlayers == 2 then
                 lobby.status = "starting"
                 
                 -- Generate a unique token for THIS specific countdown

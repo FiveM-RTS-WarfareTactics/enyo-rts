@@ -18,10 +18,10 @@ function StartMatchFromLobby(lobbyCode)
     -- Double-check that the lobby wasn't aborted during the timeout!
     if not lobby then return end
     if lobby.status ~= "starting" and not lobby.forceStart then return end 
-    if #lobby.players ~= Config.MatchSettings.MaxPlayers and not lobby.forceStart then return end
+    if #lobby.players ~= 2 and not lobby.forceStart then return end
 
     -- ALLOW THE OVERRIDE BYPASS HERE:
-    if not lobby or (#lobby.players ~= Config.MatchSettings.MaxPlayers and not lobby.forceStart) then
+    if not lobby or (#lobby.players ~= 2 and not lobby.forceStart) then
         DebugPrint("Cannot start match: Invalid lobby or not enough players")
         return
     end
@@ -722,7 +722,7 @@ function EndMatch(matchId, result)
         code = oldCode, host = nil, hostName = "Waiting for Commander...", 
         players = remPlayers, readyPlayers = remReady, 
         platoons = {}, map = match.map, createdAt = os.time(), 
-        status = "waiting", maxPlayers = Config.MatchSettings.MaxPlayers 
+        status = "waiting", maxPlayers = 2 
     }
     
     -- ==========================================

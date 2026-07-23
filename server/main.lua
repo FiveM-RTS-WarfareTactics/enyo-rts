@@ -43,7 +43,6 @@ RTS.GetPlayer = function(source)
 end
 
 math.randomseed(os.time())
-Config.MatchSettings.MaxPlayers = 2
 
 -- Global State
 Matches = {}
