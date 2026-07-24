@@ -1549,3 +1549,7 @@ RegisterNetEvent('rts:client:cpuDoSpawn', function(unitData)
     
     SetModelAsNoLongerNeeded(modelHash)
 end)
+
+-- Map editor actions handled by rts-mapbuilder resource
+RegisterNUICallback('editorAction', function(data, cb) cb({}) end)
+RegisterNUICallback('editorKey', function(data, cb) cb({}) end)
