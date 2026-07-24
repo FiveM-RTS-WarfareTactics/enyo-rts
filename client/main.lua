@@ -190,6 +190,8 @@ CpuBot = { active = false, commandPoints = 1500, cooldowns = {0,0,0,0,0}, platoo
 -- Framework Init
 CreateThread(function()
     local ped = PlayerPedId()
+    while not DoesEntityExist(ped) do Wait(100) ped = PlayerPedId() end
+
     SetEntityCoords(ped, 0.0, 0.0, 1000.0)
     SetEntityVisible(ped, false)
     SetEntityCollision(ped, false)
