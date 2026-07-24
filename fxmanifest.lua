@@ -13,7 +13,6 @@ shared_scripts {
 client_scripts {
     'client/main.lua',
     'client/camera.lua',
-    'client/commands.lua',
     'client/dedicated.lua',
     'client/environment.lua',
     'client/nui_bridge.lua',
