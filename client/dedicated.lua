@@ -1,12 +1,16 @@
 -- [[ RTS Framework - Menu auto-open after loadscreen ]]
 
-CreateThread(function()
-    while GetIsLoadingScreenActive() do Wait(100) end
-    while IsPlayerSwitchInProgress() do Wait(100) end
-
+local function OpenMenu()
     SetNuiFocus(true, true)
     SetNuiFocusKeepInput(true)
     OpenRTSCentral()
+end
+
+AddEventHandler('playerSpawned', function()
+    while GetIsLoadingScreenActive() do Wait(100) end
+    while IsPlayerSwitchInProgress() do Wait(100) end
+    Wait(500)
+    OpenMenu()
 end)
 
 RegisterNetEvent('enyo-rts:client:takeScreenshot', function(webhookUrl)
