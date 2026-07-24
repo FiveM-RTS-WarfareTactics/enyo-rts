@@ -137,7 +137,14 @@ function OpenRTSCentral()
 
     SetNuiFocus(true, true)
     SetNuiFocusKeepInput(true)
-    SendNUIMessage({ action = 'showCentralMenu', serverStats = fallbackStats })
+    SendNUIMessage({
+        action = 'showCentralMenu',
+        serverStats = fallbackStats,
+        unitConfig = Config.Units,
+        categories = Config.UnitCategories,
+        maps = Config.Maps,
+        keys = Config.Keys
+    })
 
     -- Background loop to fetch real DB stats
     CreateThread(function()
