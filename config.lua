@@ -629,6 +629,7 @@ Config.Maps = {
             { model = "prop_box_ammo03a_set2", x = -709.47, y = -867.28, z = 23.05, h = 267.70 },
     }
 }
+}
 
 -- Rewards & Economy
 Config.Rewards = {

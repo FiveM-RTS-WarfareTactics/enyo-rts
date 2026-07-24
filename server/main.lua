@@ -17,11 +17,12 @@ end
 
 RegisterNetEvent('rts:standalone:triggerCallback', function(name, requestId, ...)
     local src = source
+    local args = { ... }
     Citizen.CreateThread(function()
         if ServerCallbacks[name] then
             ServerCallbacks[name](src, function(...)
                 TriggerClientEvent('rts:standalone:callbackResponse', src, requestId, ...)
-            end, ...)
+            end, table.unpack(args))
         else
             print("^1[RTS] Missing Callback: " .. name .. "^7")
         end
