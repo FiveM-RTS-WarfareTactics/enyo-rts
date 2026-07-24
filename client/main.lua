@@ -136,7 +136,7 @@ function OpenRTSCentral()
     }
 
     SetNuiFocus(true, true)
-    SetNuiFocusKeepInput(false)
+    SetNuiFocusKeepInput(true)
     SendNUIMessage({ action = 'showCentralMenu', serverStats = fallbackStats })
 
     -- Background loop to fetch real DB stats
