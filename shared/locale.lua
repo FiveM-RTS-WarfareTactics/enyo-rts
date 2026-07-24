@@ -50,6 +50,8 @@ end
 
 --- Triggers a server callback from client side
 --- Must be paired with client-side callback handler
+ClientCallbacks = ClientCallbacks or {}
+
 function TriggerServerCallback(name, cb, ...)
     local requestId = GetGameTimer() -- Simple unique-ish ID
     ClientCallbacks[requestId] = cb
@@ -100,15 +102,3 @@ function CalculateLevel(totalScore)
         xpForNext = math.floor(xpForNext * xpCurve)
     end
 end
-
-return {
-    DebugPrint = DebugPrint,
-    GetTableSize = GetTableSize,
-    NotifyPlayer = NotifyPlayer,
-    ClientNotify = ClientNotify,
-    RegisterServerCallback = RegisterServerCallback,
-    TriggerServerCallback = TriggerServerCallback,
-    GetPlayerIdentifier = GetPlayerIdentifier,
-    GetRTSName = GetRTSName,
-    CalculateLevel = CalculateLevel,
-}
