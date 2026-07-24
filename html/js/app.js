@@ -1357,7 +1357,19 @@ if (sfxSlider) {
             case 'showCentralMenu':
                 if (data.serverStats) this.updateServerInfo(data.serverStats);
                 if (data.serverStats && data.serverStats.myStats) this.updateStats(data.serverStats.myStats);
-            
+
+                if (data.unitConfig || data.maps) {
+                    this.unitConfig = data.unitConfig;
+                    this.unitData = data.unitConfig;
+                    this.categories = data.categories;
+                    this.mapData = data.maps;
+                    this.keyConfig = data.keys;
+                    this.mapKeys = Object.keys(data.maps || {});
+                    this.renderCategoryButtons();
+                    this.renderUnitList('all');
+                    this.buildMapCarousel();
+                }
+
                 this.showScreen('mainMenu');
             
                 // FADE OUT LOADING SCREEN
