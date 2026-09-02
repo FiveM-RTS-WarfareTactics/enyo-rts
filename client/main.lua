@@ -90,6 +90,25 @@ function DebugPrint(msg)
     end
 end
 
+local projectionDebugged = false
+function ProjectWorldToScreen(worldX, worldY, worldZ)
+    local onScreen, x, y = GetScreenCoordFromWorldCoord(worldX, worldY, worldZ)
+
+    if not projectionDebugged then
+        projectionDebugged = true
+        local screenW, screenH = GetActiveScreenResolution()
+        DebugPrint(string.format("Projection sample raw: x=%.4f y=%.4f screenW=%d screenH=%d", x, y, screenW, screenH))
+    end
+
+    if onScreen and (math.abs(x) > 2.0 or math.abs(y) > 2.0) then
+        local screenW, screenH = GetActiveScreenResolution()
+        if screenW and screenW > 0 then x = x / screenW end
+        if screenH and screenH > 0 then y = y / screenH end
+    end
+
+    return onScreen, x, y
+end
+
 CreateThread(function()
     DebugPrint("Tactical RTS Client Initializing...")
     

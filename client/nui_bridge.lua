@@ -22,6 +22,13 @@ RegisterNUICallback('initialize', function(data, cb)
         keys = Config.Keys 
     })
 
+    if not MenuPushed then
+        MenuPushed = true
+        SetNuiFocus(true, true)
+        SetNuiFocusKeepInput(false)
+        OpenRTSCentral()
+    end
+
     cb({ success = true, version = Config.Version })
 end)
 
@@ -293,7 +300,7 @@ RegisterNUICallback('selectUnits', function(data, cb)
     for unitId, unit in pairs(GameState.units) do
         if unit and unit.entity and DoesEntityExist(unit.entity) and GetEntityHealth(unit.entity) > 0 then
             local pos = GetEntityCoords(unit.entity)
-            local onScreen, screenX, screenY = GetScreenCoordFromWorldCoord(pos.x, pos.y, pos.z)
+            local onScreen, screenX, screenY = ProjectWorldToScreen(pos.x, pos.y, pos.z)
             
             if onScreen then
                 
@@ -308,7 +315,7 @@ RegisterNUICallback('selectUnits', function(data, cb)
                     worldRadius = size * 0.6
                 end
 
-                local _, edgeX, edgeY = GetScreenCoordFromWorldCoord(pos.x + worldRadius, pos.y, pos.z)
+                local _, edgeX, edgeY = ProjectWorldToScreen(pos.x + worldRadius, pos.y, pos.z)
                 local edgePixelX = edgeX * screenW
                 local edgePixelY = edgeY * screenH
                 
@@ -1015,7 +1022,7 @@ AddEventHandler('rts:platoonDeployed', function(data)
 
         if targetPos then
             
-            local onScreen, screenX, screenY = GetScreenCoordFromWorldCoord(targetPos.x, targetPos.y, targetPos.z)
+            local onScreen, screenX, screenY = ProjectWorldToScreen(targetPos.x, targetPos.y, targetPos.z)
             
             if not onScreen then
                 SlideCameraTo(targetPos)

@@ -1,3 +1,16 @@
+var UI_ZOOM = 1;
+(function applyDesignScale() {
+    try {
+        var designW = 1920;
+        var w = window.innerWidth || designW;
+        var z = Math.max(0.5, Math.min(2, w / designW));
+        if (Math.abs(z - 1) > 0.02) {
+            document.documentElement.style.zoom = String(z);
+            UI_ZOOM = z;
+        }
+    } catch (err) {}
+})();
+
 window.addEventListener('message', (e) => {
     if (e.data.eventName === 'loadProgress') {
         
@@ -109,8 +122,6 @@ updateObjectiveUI(objectives) {
         this.overlayContainer = document.getElementById('game-input-layer');
     }
 
-    const screenW = window.innerWidth || 1920;
-    const screenH = window.innerHeight || 1080;
     const currentTimestamp = Date.now();
 
     objArray.forEach(obj => {
@@ -182,9 +193,9 @@ updateObjectiveUI(objectives) {
             el.style.display = 'none';
         } else {
             el.style.display = 'flex';
-            const x = (obj.x * screenW).toFixed(0);
-            const y = (obj.y * screenH).toFixed(0);
-            el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+            el.style.left = (obj.x * 100).toFixed(2) + '%';
+            el.style.top = (obj.y * 100).toFixed(2) + '%';
+            el.style.transform = 'translate(-50%, -50%)';
             
             let targetTeam = 0;
             if (obj.owner !== 0) targetTeam = obj.owner; // Owner takes priority
@@ -244,8 +255,6 @@ updateUnitPositions(units) {
     }
 
     const currentTimestamp = Date.now();
-    const screenW = window.innerWidth || 1920;
-    const screenH = window.innerHeight || 1080;
 
     units.forEach(unit => {
         const unitId = String(unit.id);
@@ -284,9 +293,9 @@ updateUnitPositions(units) {
         el.style.display = 'block';
         el.dataset.lastSeen = currentTimestamp;
 
-        const x = (unit.x * screenW).toFixed(0);
-        const y = (unit.y * screenH).toFixed(0);
-        el.style.transform = `translate(${x}px, ${y}px)`;
+        el.style.left = (unit.x * 100).toFixed(2) + '%';
+        el.style.top = (unit.y * 100).toFixed(2) + '%';
+        el.style.transform = '';
 
         const textEl = el.querySelector('.unit-health-text');
         if (textEl) {
@@ -392,7 +401,8 @@ updateDeployedPlatoons(list) {
     });
 }
     init(first) {
-        const isGameMode = !!window.invokeNative; 
+        const isLoadscreenContext = (typeof GetParentResourceName === 'function') && GetParentResourceName() === 'loadingScreen';
+        const isGameMode = !!window.invokeNative && !isLoadscreenContext;
         this.overlayContainer = document.getElementById('game-input-layer');
 
         if (this.tips && this.tips.length > 0) {
@@ -454,10 +464,10 @@ updateDeployedPlatoons(list) {
                 startY = e.clientY;
 
                 if (selectRect) {
-                    selectRect.style.left = startX + 'px';
-                    selectRect.style.top = startY + 'px';
-                    selectRect.style.width = '0px';
-                    selectRect.style.height = '0px';
+                    selectRect.style.left = (startX / window.innerWidth * 100) + '%';
+                    selectRect.style.top = (startY / window.innerHeight * 100) + '%';
+                    selectRect.style.width = '0%';
+                    selectRect.style.height = '0%';
                     selectRect.classList.remove('hidden');
                 }
 
@@ -485,10 +495,10 @@ updateDeployedPlatoons(list) {
                 const left = Math.min(currentX, startX);
                 const top = Math.min(currentY, startY);
 
-                selectRect.style.width = width + 'px';
-                selectRect.style.height = height + 'px';
-                selectRect.style.left = left + 'px';
-                selectRect.style.top = top + 'px';
+                selectRect.style.width = (width / window.innerWidth * 100) + '%';
+                selectRect.style.height = (height / window.innerHeight * 100) + '%';
+                selectRect.style.left = (left / window.innerWidth * 100) + '%';
+                selectRect.style.top = (top / window.innerHeight * 100) + '%';
             }
         });
 
@@ -757,27 +767,11 @@ if (sfxSlider) {
         const unitsList = document.getElementById('unitsList');
         if (unitsList) {
             document.addEventListener('dragstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const card = e.target.closest('.unit-card');
-                if (card) {
-                    this.draggedUnit = card.dataset.unitType;
-                    e.dataTransfer.setData('text/plain', this.draggedUnit);
-                    e.dataTransfer.effectAllowed = 'copyMove';
-
-                    var dragIcon = card.cloneNode(true);
-                    dragIcon.classList.remove('dragging'); // Ensure ghost is visible
-                    dragIcon.style.position = "absolute";
-                    dragIcon.style.top = "-1000px";
-                    dragIcon.style.opacity = "1";
-                    dragIcon.style.width = card.offsetWidth + "px"; // Keep size
-                    document.body.appendChild(dragIcon);
-                    e.dataTransfer.setDragImage(dragIcon, 0, 0);
-
-                    setTimeout(() => {
-                        card.classList.add('dragging');
-                        document.body.removeChild(dragIcon); // Clean up ghost source
-                    }, 0);
-
-                }
+                if (!card) return;
+                this.draggedUnit = null;
             });
 
             unitsList.addEventListener('dragend', (e) => {
@@ -1002,8 +996,8 @@ if (sfxSlider) {
     initManualDragSystem() {
         let dragClone = null;
         let dragData = null;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
+        let halfW = 0;
+        let halfH = 0;
 
         document.addEventListener('mousedown', (e) => {
             if (e.button !== 0) return; // Only Left Click
@@ -1014,8 +1008,8 @@ if (sfxSlider) {
             e.preventDefault();
 
             const rect = card.getBoundingClientRect();
-            dragOffsetX = e.clientX - rect.left;
-            dragOffsetY = e.clientY - rect.top;
+            halfW = rect.width / 2;
+            halfH = rect.height / 2;
 
             dragData = card.dataset.unitType;
 
@@ -1027,9 +1021,10 @@ if (sfxSlider) {
 
             document.body.appendChild(dragClone);
 
-            const x = e.clientX - dragOffsetX;
-            const y = e.clientY - dragOffsetY;
-            dragClone.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+            const x = (e.clientX - halfW) / window.innerWidth * 100;
+            const y = (e.clientY - halfH) / window.innerHeight * 100;
+            dragClone.style.left = x + '%';
+            dragClone.style.top = y + '%';
 
             card.classList.add('dragging-source');
 
@@ -1038,9 +1033,10 @@ if (sfxSlider) {
         document.addEventListener('mousemove', (e) => {
             if (!dragClone) return;
 
-            const x = e.clientX - dragOffsetX;
-            const y = e.clientY - dragOffsetY;
-            dragClone.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+            const x = (e.clientX - halfW) / window.innerWidth * 100;
+            const y = (e.clientY - halfH) / window.innerHeight * 100;
+            dragClone.style.left = x + '%';
+            dragClone.style.top = y + '%';
         });
 
         document.addEventListener('mouseup', (e) => {
@@ -1050,8 +1046,8 @@ if (sfxSlider) {
             dragClone = null;
             document.querySelectorAll('.dragging-source').forEach(el => el.classList.remove('dragging-source'));
 
-            const elementUnderMouse = document.elementFromPoint(e.clientX, e.clientY);
-            const slot = elementUnderMouse ? elementUnderMouse.closest('.platoon-slot') : null;
+            const target = e.target;
+            const slot = target ? target.closest('.platoon-slot') : null;
 
             if (slot && dragData) {
                 this.showUnitSelectionModal(dragData, slot.dataset.slot);
@@ -1335,6 +1331,9 @@ if (sfxSlider) {
     }
 
     async fetchNUI(action, data) {
+        if ((typeof GetParentResourceName === 'function') && GetParentResourceName() === 'loadingScreen') {
+            return { success: false, message: 'NUI unavailable in loadscreen' };
+        }
         return fetch(`https://${GetParentResourceName()}/${action}`, {
                 method: 'POST',
                 headers: {
@@ -1666,12 +1665,7 @@ renderUnitList(category = 'all') {
             card.className = classString;
             card.dataset.unitType = key;
 
-            if (isLocked) {
-                card.removeAttribute('draggable');
-            } else {
-                card.setAttribute('draggable', 'true');
-            }
-
+            card.removeAttribute('draggable');
             const bgImage = unit.thumbnail ? `images/units/${unit.thumbnail}` : 'images/units/default.png';
             card.style.backgroundImage = `url('${bgImage}')`;
 

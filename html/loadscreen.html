@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TACTICAL RTS ENYO UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body class="ui-root">
+    <div class="fx-overlay"></div>
+    <div class="app-bg-image"></div>
+
+    <div id="loadingScreen" class="screen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: flex; background-color: #000;">
+        <div class="loading-backdrop"></div>
+        <div class="loading-content">
+            <div class="loading-title-group">
+                <img src="images/rtslogo2.png" class="game-logo-large" alt="TACTICAL WARFARE V">
+                <div class="sub-title">REAL-TIME STRATEGY</div>
+            </div>
+            <div class="loading-status-group">
+                <div class="spinner-ring"></div>
+                <div class="status-text" id="loadingStatusText">CONNECTING...</div>
+            </div>
+            <div class="loading-progress-track">
+                <div class="loading-bar-fill" id="loadingBarFill"></div>
+            </div>
+            <div class="loading-tip-group">
+                <div class="tip-label">ADVISORY</div>
+                <div class="tip-text" id="loadingTipText">
+                    Manage your economy wisely. Running out of funds is a choice.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var tips = [
+            "Control the objectives. Or don't, if you enjoy being poor.",
+            "Tanks are expensive. Try not to drive them off a cliff.",
+            "If you are losing, surrendering saves time... but makes you a coward.",
+            "Running out of money is a skill issue. Manage your economy better.",
+            "Level up to unlock aircraft. Until then, enjoy walking.",
+            "The enemy is capturing your objectives while you read this.",
+            "You can deploy heavy support, or you can keep losing. Your choice."
+        ];
+
+        function setRandomTip() {
+            var el = document.getElementById('loadingTipText');
+            if (el) el.textContent = tips[Math.floor(Math.random() * tips.length)];
+        }
+        setRandomTip();
+        setInterval(setRandomTip, 3000);
+
+        window.addEventListener('message', function (e) {
+            if (!e.data || e.data.eventName !== 'loadProgress') return;
+
+            var pct = Math.floor(e.data.loadFraction * 100);
+            var bar = document.getElementById('loadingBarFill');
+            var status = document.getElementById('loadingStatusText');
+
+            if (bar) bar.style.width = pct + '%';
+
+            if (status) {
+                if (pct < 10) {
+                    status.textContent = 'EXECUTING INIT CORE... ' + pct + '%';
+                } else if (pct < 40) {
+                    status.textContent = 'FETCHING RESOURCE DATA... ' + pct + '%';
+                } else if (pct < 55) {
+                    status.textContent = 'EXECUTING INIT BEFORE MAP LOADED... ' + pct + '%';
+                } else if (pct < 75) {
+                    status.textContent = 'MOUNTING MAP ASSETS... ' + pct + '%';
+                } else if (pct < 90) {
+                    status.textContent = 'EXECUTING INIT AFTER MAP LOADED... ' + pct + '%';
+                } else if (pct < 98) {
+                    status.textContent = 'EXECUTING INIT SESSION... ' + pct + '%';
+                } else if (pct < 100) {
+                    status.textContent = 'AWAITING CLIENT SCRIPTS... ' + pct + '%';
+                } else {
+                    status.textContent = 'HANDOVER COMPLETE AWAITING RENDER';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

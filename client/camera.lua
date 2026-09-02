@@ -120,10 +120,6 @@ function UpdateCamera()
     if not MapEditor.active and (not GameState.currentMap or not Config.Maps[GameState.currentMap]) then return end
     local mouseX = GetDisabledControlNormal(0, 239)
     local mouseY = GetDisabledControlNormal(0, 240)
-    local moveX, moveY = 0.0, 0.0
-    local panSpeed = 1.5
-    if mouseX < 0.02 then moveX = -panSpeed elseif mouseX > 0.98 then moveX = panSpeed end
-    if mouseY < 0.02 then moveY = panSpeed elseif mouseY > 0.98 then moveY = -panSpeed end
     local camPos = GetCamCoord(GameState.camera)
     local mapZ = Config.Maps[GameState.currentMap or "grapeseed"].center.z
     local minH = (Config.MatchSettings.CameraMinHeight + mapZ) or 15.0
@@ -134,6 +130,13 @@ function UpdateCamera()
     end
     if GameState.cameraHeight < minH then GameState.cameraHeight = minH end
     if GameState.cameraHeight > maxH then GameState.cameraHeight = maxH end
+    local defaultH = (Config.MatchSettings.CameraDefaultHeight + mapZ) or (Config.MatchSettings.CameraDefaultHeight or 40.0)
+    local zoomRatio = defaultH > 0 and (GameState.cameraHeight / defaultH) or 1.0
+    local speedFactor = math.min(1.0, 0.15 + 0.85 * math.max(0.0, zoomRatio))
+    local panSpeed = 1.5 * speedFactor
+    local moveX, moveY = 0.0, 0.0
+    if mouseX < 0.02 then moveX = -panSpeed elseif mouseX > 0.98 then moveX = panSpeed end
+    if mouseY < 0.02 then moveY = panSpeed elseif mouseY > 0.98 then moveY = -panSpeed end
     local smoothSpeed = Config.MatchSettings.CameraSmoothSpeed or 0.1
     local newZ = camPos.z + (GameState.cameraHeight - camPos.z) * smoothSpeed
     local newPos = vector3(camPos.x + moveX, camPos.y + moveY, newZ)

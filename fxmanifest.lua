@@ -35,11 +35,12 @@ server_scripts {
     'server/commands.lua',
 }
 
-loadscreen 'html/index.html'
+loadscreen 'html/loadscreen.html'
 ui_page 'html/index.html'
 
 files {
     'html/index.html',
+    'html/loadscreen.html',
     'html/css/*.css',
     'html/js/*.js',
     'html/js/modules/*.js',

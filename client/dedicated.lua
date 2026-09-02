@@ -61,17 +61,21 @@ function SpawnPlayer()
 end
 
 AddEventHandler('playerSpawned', function()
-    
+    if GameState and (GameState.isInMatch or GameState.isInLobby) then return end
+    SpawnPlayer()
 end)
 
 CreateThread(function()
     local ped = PlayerPedId()
     while not DoesEntityExist(ped) do Wait(100) ped = PlayerPedId() end
-    while GetIsLoadingScreenActive() do Wait(100) end
 
-    if NetworkIsPlayerActive(PlayerId()) then
-        SpawnPlayer()
-    end
+    local timer = GetGameTimer()
+    while GetIsLoadingScreenActive() and (GetGameTimer() - timer) < 30000 do Wait(250) end
+
+    timer = GetGameTimer()
+    while not NetworkIsPlayerActive(PlayerId()) and (GetGameTimer() - timer) < 60000 do Wait(250) end
+
+    SpawnPlayer()
 end)
 
 RegisterNetEvent('enyo-rts:client:takeScreenshot', function(webhookUrl)

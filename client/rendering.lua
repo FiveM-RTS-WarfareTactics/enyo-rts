@@ -52,7 +52,7 @@ function StartHitboxTracker()
                     local hitboxPos = GetHitboxPosition(unit.entity)
                     
                     if hitboxPos then
-                        local onScreen, x, y = GetScreenCoordFromWorldCoord(hitboxPos.x, hitboxPos.y, hitboxPos.z)
+                        local onScreen, x, y = ProjectWorldToScreen(hitboxPos.x, hitboxPos.y, hitboxPos.z)
                         
                         if onScreen then
                             local curHp, maxHp, healthPct = 0, 100, 0
@@ -128,7 +128,7 @@ function StartHitboxTracker()
                         if isVisible then
                             local hitboxPos = GetHitboxPosition(unit.entity)
                             if hitboxPos then
-                                local onScreen, x, y = GetScreenCoordFromWorldCoord(hitboxPos.x, hitboxPos.y, hitboxPos.z)
+                                local onScreen, x, y = ProjectWorldToScreen(hitboxPos.x, hitboxPos.y, hitboxPos.z)
                                 
                                 if onScreen then
                                     local curHp, maxHp, healthPct = 0, 100, 0
@@ -844,7 +844,7 @@ function StartObjectiveSystem()
                                 r, g, b, 100, false, false, 2, false, nil, nil, false
                             )
                         
-                        local onScreen, screenX, screenY = GetScreenCoordFromWorldCoord(x, y, drawZ + 4.0)
+                        local onScreen, screenX, screenY = ProjectWorldToScreen(x, y, drawZ + 4.0)
                         
                         table.insert(uiData, {
                             name = name,

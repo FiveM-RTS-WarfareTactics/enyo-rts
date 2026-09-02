@@ -188,7 +188,7 @@ function SelectUnitsInRectangle(rect)
     for unitId, unit in pairs(GameState.units) do
         if unit.entity and DoesEntityExist(unit.entity) then
             local unitPos = GetEntityCoords(unit.entity)
-            local onScreen, normX, normY = GetScreenCoordFromWorldCoord(unitPos.x, unitPos.y, unitPos.z)
+            local onScreen, normX, normY = ProjectWorldToScreen(unitPos.x, unitPos.y, unitPos.z)
             
             if onScreen then
                 
@@ -220,7 +220,7 @@ function GetUnitAtScreenPosition(cursorX, cursorY)
         if unit.entity and DoesEntityExist(unit.entity) then
             local unitPos = GetEntityCoords(unit.entity)
             
-            local onScreen, normX, normY = GetScreenCoordFromWorldCoord(unitPos.x, unitPos.y, unitPos.z)
+            local onScreen, normX, normY = ProjectWorldToScreen(unitPos.x, unitPos.y, unitPos.z)
             
             if onScreen then
                 
